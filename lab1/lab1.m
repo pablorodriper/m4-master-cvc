@@ -15,17 +15,16 @@
 
 %% 1.1. Similarities
 I=imread('Data/0005_s.png'); % we have to be in the proper folder
-% test data
-%I = [1 1 1; 0 2 3;0 0 4]
 
-sigma = pi/4;
+% ToDo: generate a matrix H which produces a similarity transformation
+
+sigma = pi/3;
 s = 1;
 R  = [cos(sigma) -sin(sigma);sin(sigma) cos(sigma)];
 %R = [-1 0; 0 1];       % mirroring
 H = [s.*R zeros(length(R),1); zeros(1,length(R)) ones(1,1)];
 
 I2 = apply_H(I, H);
-%I2
 figure; imshow(I); figure; imshow(uint8(I2));
 
 
@@ -33,74 +32,30 @@ figure; imshow(I); figure; imshow(uint8(I2));
 
 % ToDo: generate a matrix H which produces an affine transformation
 
-I=imread('Data/0005_s.png'); % we have to be in the proper folder
-
-A  = [2 2; -1 1];    
-H1 = [A [1 0]'; zeros(1,length(A)) ones(1,1)];
-I3 = apply_H(I, H1);
-%figure; imshow(I); figure; imshow(uint8(I3));
+I2 = apply_H(I, H);
+figure; imshow(I); figure; imshow(uint8(I2));
 
 % ToDo: decompose the affinity in four transformations: two
 % rotations, a scale, and a translation
-%Perform the SVD decomposition
-%https://www.lucidar.me/en/mathematics/singular-value-decomposition-of-a-2x2-matrix/
-[U, SIG, V] = svd2x2(A);
-
-%Using the following reference to perform the transformations
-%https://es.mathworks.com/help/images/matrix-representation-of-geometric-transformations.html
-%Rotation 1
-R1  = [V' zeros(length(V'),1); zeros(1,length(V')) ones(1,1)];
-%Scale
-S = [SIG zeros(length(SIG),1); zeros(1,length(SIG)) ones(1,1)];
-%Rotation 2
-R2 =[ U zeros(length( U),1); zeros(1,length( U)) ones(1,1)];
-%Translation
-T = [1 0 0; 0 1 0; 1 0 1];
 
 % ToDo: verify that the product of the four previous transformations
 % produces the same matrix H as above
-H2 = T'*R2*S*R1; H2 = double(int64(H2));
-if H1 == H2
-    disp('OK: H1 and H2 are equal')
-else
-    disp('ERROR: H1 and H2 are not equal')
-    return
-end
 
 % ToDo: verify that the proper sequence of the four previous
 % transformations over the image I produces the same image I2 as before
-I4 = apply_H(I, H2);
-if int64(I3) == int64(I4)
-    disp('OK: I3 and I4 are equal')
-else
-    disp('ERROR: I3 and I4 are not equal')
-    return
-end
-%figure; imshow(I); figure; imshow(uint8(I4));
+
 
 
 %% 1.3 Projective transformations (homographies)
 
-I=imread('Data/0005_s.png'); % we have to be in the proper folder
-
 % ToDo: generate a matrix H which produces a projective transformation
-A  = [0.5 2; -1 1];
-
-H = [A [1 0]'; [0.1 0.1] 1];
-
-if det(H) ~= 0
-    disp('OK: The matrix H is non-singular')
-else
-    disp('ERROR: The matrix H is not non-singular')
-    return
-end
 
 I2 = apply_H(I, H);
 figure; imshow(I); figure; imshow(uint8(I2));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Affine Rectification
-
+close all
 
 % choose the image points
 I=imread('Data/0000_s.png');
@@ -149,8 +104,9 @@ v2 = cross(l3, l4);
 l_inf = cross(v1, v2);
 l_inf = [l_inf(1)/l_inf(3) l_inf(2)/l_inf(3) 1]';
 
+A  = [2 2; -1 1];    
+H1 = [A [1 0]'; zeros(1,length(A)) ones(1,1)];
 H = [1 0 0; 0 1 0; l_inf(1) l_inf(2) l_inf(3)]; %H = H_aff*[]
-
 I2 = apply_H(I, H);
 figure; imshow(uint8(I2));
 
