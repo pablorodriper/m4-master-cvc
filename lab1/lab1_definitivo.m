@@ -179,7 +179,7 @@ lr3 = H.'\l3;
 lr4 = H.'\l4;
 
 % show the transformed lines in the transformed image
-figure;imshow(uint8(I2)); title('Affine Rectification with lines')
+figure;imshow(uint8(I2)); title('Affine Rectification with Lines')
 hold on;
 t=1:0.1:1000;
 plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
@@ -231,6 +231,8 @@ cos_4_r = (nr4*nr3')/(sqrt(nr4*nr4')*sqrt(nr3*nr3'))
 %       Compute also the angles between the pair of lines before and after
 %       rectification.
 % choose the image points
+
+clear all
 I=imread('Data/0000_s.png');
 A = load('Data/0000_s_info_lines.txt');
 
@@ -249,7 +251,6 @@ p7 = [A(i,1) A(i,2) 1]';
 p8 = [A(i,3) A(i,4) 1]';
 
 
-
 % ToDo: compute the lines l1, l2, l3, l4, that pass through the different pairs of points
 
 l1 = cross(p1, p2);
@@ -260,7 +261,6 @@ l4 = cross(p7, p8);
 %Vanishing points provided by each pair of parallel lines
 v1 = cross(l1, l2);
 v2 = cross(l3, l4);
-
 
 %Vanishing line
 l_inf = cross(v1, v2);
@@ -273,7 +273,6 @@ lr1 = Ha'\l1;
 lr2 = Ha'\l2;
 lr3 = Ha'\l3;
 lr4 = Ha'\l4;
-
 
 %1. l1 l3 be the image of two lines that are orthogonal in the world.
 %MX = b
@@ -297,7 +296,7 @@ lrr2 = Ha_s'\l2;
 lrr3 = Ha_s'\l3;
 lrr4 = Ha_s'\l4;
 
-figure; imshow(uint8(I3));
+figure; imshow(uint8(I3)); title('Metric Rectification with lines')
 hold on;
 t=1:0.1:1000;
 plot(t, -(lrr1(1)*t + lrr1(3)) / lrr1(2), 'y');
@@ -324,7 +323,6 @@ nr1 = [lrr1(1)/lrr1(3), lrr1(2)/lrr1(3)];
 nr2 = [lrr2(1)/lrr2(3), lrr2(2)/lrr2(3)];
 nr3 = [lrr3(1)/lrr3(3), lrr3(2)/lrr3(3)];
 nr4 = [lrr4(1)/lrr4(3), lrr4(2)/lrr4(3)];
-
 
 cos_1_r = (nr1*nr3')/(sqrt(nr1*nr1')*sqrt(nr3*nr3'))
 cos_2_r = (nr2*nr4')/(sqrt(nr2*nr2')*sqrt(nr4*nr4'))
