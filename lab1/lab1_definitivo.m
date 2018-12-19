@@ -329,3 +329,129 @@ cos_2_r = (nr2*nr4')/(sqrt(nr2*nr2')*sqrt(nr4*nr4'))
 cos_3_r = (nr1*nr2')/(sqrt(nr1*nr1')*sqrt(nr2*nr2'))
 cos_4_r = (nr4*nr3')/(sqrt(nr4*nr4')*sqrt(nr3*nr3'))
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 4. Affine and Metric Rectification of the left facade of image 0001
+close all
+clear all
+% ToDo: Write the code that rectifies the left facade of image 0001 with
+%       the stratified method (affine + metric). 
+%       Crop the initial image so that only the left facade is visible.
+%       Show the (properly) transformed lines that use in every step.
+
+
+% Indices of lines
+I=imread('Data/0001_s.png');
+A = load('Data/0001_s_info_lines.txt');
+
+I = I(:,1:450,:);
+figure; imshow(I); title('Original image 0001\_s resized.png');
+
+% Indices of lines
+i = 614;
+p1 = [A(i,1) A(i,2) 1]';
+p2 = [A(i,3) A(i,4) 1]';
+i = 159;
+p3 = [A(i,1) A(i,2) 1]';
+p4 = [A(i,3) A(i,4) 1]';
+i = 645;
+p5 = [A(i,1) A(i,2) 1]';
+p6 = [A(i,3) A(i,4) 1]';
+i = 541;
+p7 = [A(i,1) A(i,2) 1]';
+p8 = [A(i,3) A(i,4) 1]';
+
+% ToDo: compute the lines l1, l2, l3, l4, that pass through the different pairs of points
+
+l1 = cross(p1, p2);
+l2 = cross(p3, p4);
+l3 = cross(p5, p6);
+l4 = cross(p7, p8);
+
+% Crossed lines
+p9 = cross(l1, l3);
+p10 = cross(l1, l4);
+p11 = cross(l2, l3);
+p12 = cross(l2, l4);
+l5 = cross(p9, p12);
+l6 = cross(p10, p11);
+
+% Show the chosen lines in the image
+figure;imshow(I); title('Original image 0001\_s resized with lines.png'); 
+hold on;
+t=1:0.1:1000;
+plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
+plot(t, -(l2(1)*t + l2(3)) / l2(2), 'y');
+plot(t, -(l3(1)*t + l3(3)) / l3(2), 'y');
+plot(t, -(l4(1)*t + l4(3)) / l4(2), 'y');
+hold off
+
+% ToDo: compute the homography that affinely rectifies the image
+
+% Vanishing points provided by each pair of parallel lines
+v1 = cross(l1, l2);
+v2 = cross(l3, l4);
+
+% Vanishing line
+l_inf = cross(v1, v2);
+l_inf = [l_inf(1)/l_inf(3) l_inf(2)/l_inf(3) 1]';
+
+H = [1 0 0; 0 1 0; l_inf(1) l_inf(2) l_inf(3)];
+[I2, min_row2, min_col2] = apply_H(I, H);
+
+% ToDo: compute the transformed lines lr1, lr2, lr3, lr4
+
+lr1 = H.'\l1;
+lr2 = H.'\l2;
+lr3 = H.'\l3;
+lr4 = H.'\l4;
+lr5 = H.'\l5;
+lr6 = H.'\l6;
+
+% Show the transformed lines in the transformed image
+figure;imshow(uint8(I2)); title('Affine Rectification with Lines')
+hold on;
+t=1:0.1:1000;
+plot(t+1-min_col2, 1-min_row2-(lr1(1)*t + lr1(3)) / lr1(2), 'y');
+plot(t+1-min_col2, 1-min_row2-(lr2(1)*t + lr2(3)) / lr2(2), 'y');
+plot(t+1-min_col2, 1-min_row2-(lr3(1)*t + lr3(3)) / lr3(2), 'g');
+plot(t+1-min_col2, 1-min_row2-(lr4(1)*t + lr4(3)) / lr4(2), 'g');
+plot(t+1-min_col2, 1-min_row2-(lr5(1)*t + lr5(3)) / lr5(2), 'c');
+plot(t+1-min_col2, 1-min_row2-(lr6(1)*t + lr6(3)) / lr6(2), 'c');
+hold off
+
+%Punto 3
+Ha = H;
+
+%1. l1 l3 be the image of two lines that are orthogonal in the world.
+%MX = b
+M = [lr1(1)*lr3(1) lr1(1)*lr3(2)+lr1(2)*lr3(1); lr5(1)*lr6(1) lr5(1)*lr6(2)+lr5(2)*lr6(1)];
+b = [-lr1(2)*lr3(2) -lr5(2)*lr6(2)];
+X = M\b';
+
+% Set matrix S
+S = [X(1) X(2); X(2) 1];
+K = chol(S, 'lower')
+
+Hs_a = [K [0; 0]; [0 0] 1]
+Ha_s = inv(Hs_a)
+[I3, min_row3, min_col3] = apply_H(I2, Ha_s);
+
+lrr1 = Hs_a.'*lr1;
+lrr2 = Hs_a.'*lr2;
+lrr3 = Hs_a.'*lr3;
+lrr4 = Hs_a.'*lr4;
+lrr5 = Hs_a.'*lr5;
+lrr6 = Hs_a.'*lr6;
+
+figure; imshow(uint8(I3)); title('Metric Rectification with Lines')
+hold on;
+t=1:0.1:1000;
+plot(t+1-min_col3, 1-min_row3-(lrr1(1)*t + lrr1(3)) / lrr1(2), 'y');
+plot(t+1-min_col3, 1-min_row3-(lrr2(1)*t + lrr2(3)) / lrr2(2), 'y');
+plot(t+1-min_col3, 1-min_row3-(lrr3(1)*t + lrr3(3)) / lrr3(2), 'g');
+plot(t+1-min_col3, 1-min_row3-(lrr4(1)*t + lrr4(3)) / lrr4(2), 'g');
+plot(t+1-min_col3, 1-min_row3-(lrr5(1)*t + lrr5(3)) / lrr5(2), 'c');
+plot(t+1-min_col3, 1-min_row3-(lrr6(1)*t + lrr6(3)) / lrr6(2), 'c');
+
+hold off
