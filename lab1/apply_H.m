@@ -1,4 +1,4 @@
-function I_trans = apply_H(I,H)
+function [I_trans, min_row, min_col] = apply_H(I,H)
     
     %Original image
     [m, n, color] = size(I);
@@ -29,13 +29,13 @@ function I_trans = apply_H(I,H)
             end
         end
     end
-    
-    
+
     %Destination image
     I_trans = zeros(ceil(x_max)-floor(x_min)+1, ceil(y_max)-floor(y_min)+1, color);
     %I_trans = zeros(ceil(y_max)-floor(y_min)+1, ceil(x_max)-floor(x_min)+1, color);
     
-    
+    min_row = floor(x_min);
+    min_col = floor(y_min);
 
     %Transform coordinates in destination image to coordinates in original
     %image

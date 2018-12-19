@@ -1,42 +1,60 @@
-function I2 = apply_H(I, H)
-
-% Original image
-[row,column,color] = size(I);
-
-% Destination image
-I2_row = 2*(row+column)+1;
-I2_column = 2*(row+column)+1;
-I2 = zeros(I2_row, I2_column, color);
-
-% Boundaries of destination image
-max_row = 1; max_column = 1;
-[min_row,min_column] = size(I2);
-
-for i = 1:row
-    for j = 1:column
-        for k = 1:color
-        % Calculate coordinates transformation
-            x = H*[i,j,1]';
-            dest_row = round((I2_row/2)+x(1))+1;            
-            dest_column = round((I2_column/2)+x(2))+1;
-            I2(dest_row,dest_column,k) = I(i,j,k);
-        end
-        
-        % save coordinates to cut the final size of the image
-        if dest_row < min_row
-            min_row = dest_row;
-        end
-        if dest_row > max_row
-            max_row = dest_row;
-        end
-        if dest_column < min_column
-            min_column = dest_column;
-        end
-        if dest_column > max_column
-            max_column = dest_column;
+function I_trans = apply_H(I,H)
+    
+    %Original image
+    [m, n, color] = size(I);
+    [X,Y] = meshgrid(1:n,1:m);
+    
+    %Compute size of destination image
+    x_min = n;
+    x_max = 0;
+    y_min = m;
+    y_max = 0;
+    
+    
+    for i = [1,n]
+        for j = [1,m]
+            edge_pos = H*[i, j, 1]';
+            edge_cart = [edge_pos(1)/edge_pos(3), edge_pos(2)/edge_pos(3)];
+            if edge_cart(1) < y_min
+                y_min = edge_cart(1);
+            end
+            if edge_cart(1) > y_max
+                y_max = edge_cart(1);
+            end
+            if edge_cart(2) > x_max
+                x_max = edge_cart(2);
+            end
+            if edge_cart(2) < x_min
+                x_min = edge_cart(2);
+            end
         end
     end
-end
+    
+    
+    %Destination image
+    I_trans = zeros(ceil(x_max)-floor(x_min)+1, ceil(y_max)-floor(y_min)+1, color);
+    %I_trans = zeros(ceil(y_max)-floor(y_min)+1, ceil(x_max)-floor(x_min)+1, color);
+    
+    
 
-I2 = I2(min_row:max_row, min_column:max_column, :);
+    %Transform coordinates in destination image to coordinates in original
+    %image
+    
+    for k = 1:color
+        pos_x=[];
+        pos_y=[];
+        for y_trans = floor(y_min):ceil(y_max)
+            for x_trans = floor(x_min):ceil(x_max)
+                pos = H\[y_trans; x_trans; 1];
+                %Coordinates in original image
+                pos_cart = [pos(1)/pos(3); pos(2)/pos(3)];
+                pos_x =[pos_x pos_cart(1)];
+                pos_y =[pos_y pos_cart(2)];
+
+            end
+        end
+
+        %Interpolate values to obtain image
+       I_trans(:, :, k) = reshape(interp2(X, Y, double(I(:,:,k)), pos_x, pos_y), [ceil(x_max)-floor(x_min)+1, ceil(y_max)-floor(y_min)+1]); 
+    end
 end
