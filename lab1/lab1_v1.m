@@ -166,7 +166,7 @@ l_inf = cross(v1, v2);
 l_inf = [l_inf(1)/l_inf(3) l_inf(2)/l_inf(3) 1]';
 
 H = [1 0 0; 0 1 0; l_inf(1) l_inf(2) l_inf(3)];
-I2 = apply_H(I, H);
+[I2, min_row2, min_col2] = apply_H(I, H);
 figure; imshow(uint8(I2)); title('Affine Rectification')
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
@@ -179,10 +179,10 @@ lr4 = H.'\l4;
 figure;imshow(uint8(I2)); title('Affine Rectification with Lines')
 hold on;
 t=1:0.1:1000;
-plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
-plot(t, -(lr2(1)*t + lr2(3)) / lr2(2), 'y');
-plot(t, -(lr3(1)*t + lr3(3)) / lr3(2), 'y');
-plot(t, -(lr4(1)*t + lr4(3)) / lr4(2), 'y');
+plot(t+1-min_col2, 1-min_row2-(lr1(1)*t + lr1(3)) / lr1(2), 'y');
+plot(t+1-min_col2, 1-min_row2-(lr2(1)*t + lr2(3)) / lr2(2), 'y');
+plot(t+1-min_col2, 1-min_row2-(lr3(1)*t + lr3(3)) / lr3(2), 'y');
+plot(t+1-min_col2, 1-min_row2-(lr4(1)*t + lr4(3)) / lr4(2), 'y');
 
 % ToDo: to evaluate the results, compute the angle between the different pair 
 % of lines before and after the image transformation
@@ -284,7 +284,7 @@ K = chol(S, 'lower');
 %Build matrix Ha_s and apply it to image and lines
 Hs_a = [K [0; 0]; [0 0] 1];
 Ha_s = inv(Hs_a);
-I3 = apply_H(I, Ha_s);
+[I3, min_row3, min_col3] = apply_H(I, Ha_s);
 
 lrr1 = Ha_s'\l1;
 lrr2 = Ha_s'\l2;
@@ -294,10 +294,10 @@ lrr4 = Ha_s'\l4;
 figure; imshow(uint8(I3)); title('Metric Rectification with lines')
 hold on;
 t=1:0.1:1000;
-plot(t, -(lrr1(1)*t + lrr1(3)) / lrr1(2), 'y');
-plot(t, -(lrr2(1)*t + lrr2(3)) / lrr2(2), 'y');
-plot(t, -(lrr3(1)*t + lrr3(3)) / lrr3(2), 'y');
-plot(t, -(lrr4(1)*t + lrr4(3)) / lrr4(2), 'y');
+plot(t+1-min_col3, 1-min_row3-(lrr1(1)*t + lrr1(3)) / lrr1(2), 'y');
+plot(t+1-min_col3, 1-min_row3-(lrr2(1)*t + lrr2(3)) / lrr2(2), 'y');
+plot(t+1-min_col3, 1-min_row3-(lrr3(1)*t + lrr3(3)) / lrr3(2), 'y');
+plot(t+1-min_col3, 1-min_row3-(lrr4(1)*t + lrr4(3)) / lrr4(2), 'y');
 hold off
 
 %Compute normal vectors and angles from there
@@ -420,10 +420,10 @@ X = M\b';
 
 % Set matrix S
 S = [X(1) X(2); X(2) 1];
-K = chol(S, 'lower')
+K = chol(S, 'lower');
 
-Hs_a = [K [0; 0]; [0 0] 1]
-Ha_s = inv(Hs_a)
+Hs_a = [K [0; 0]; [0 0] 1];
+Ha_s = inv(Hs_a);
 [I3, min_row3, min_col3] = apply_H(I2, Ha_s);
 
 lrr1 = Hs_a.'*lr1;
