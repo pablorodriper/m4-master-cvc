@@ -18,13 +18,15 @@ I=imread('Data/0005_s.png'); % we have to be in the proper folder
 
 % ToDo: generate a matrix H which produces a similarity transformation
 
-sigma = pi/3;
-s = 1;
+sigma = pi/4;
+s = 0.8;
+
 R  = [cos(sigma) -sin(sigma);sin(sigma) cos(sigma)];
-%R = [-1 0; 0 1];       % mirroring
-H = [s.*R zeros(length(R),1); zeros(1,length(R)) ones(1,1)];
+R2 = [1 0; 0 -1];       % mirroring
+H = [s.*R*R2 zeros(length(R),1); zeros(1,length(R)) 1];
 
 I2 = apply_H(I, H);
+
 figure; imshow(I); figure; imshow(uint8(I2));
 
 
@@ -32,11 +34,40 @@ figure; imshow(I); figure; imshow(uint8(I2));
 
 % ToDo: generate a matrix H which produces an affine transformation
 
-I2 = apply_H(I, H);
-figure; imshow(I); figure; imshow(uint8(I2));
+I=imread('Data/0005_s.png'); % we have to be in the proper folder
 
+sigma = 0;
+theta = -pi/4;
+
+R_1  = [cos(theta) -sin(theta);sin(theta) cos(theta)];
+R_2  = [cos(-sigma) -sin(-sigma);sin(-sigma) cos(-sigma)];
+R_3  = [cos(sigma) -sin(sigma);sin(sigma) cos(sigma)];
+D = [2.8284 0; 0 1.4142];
+
+A = R_1*R_2*D*R_3
+A = [2 2; -1 1];    
+
+
+H1 = [A [1 0]'; zeros(1,length(A)) ones(1,1)];
+I3 = apply_H(I, H1);
+figure; imshow(I); figure; imshow(uint8(I3));
 % ToDo: decompose the affinity in four transformations: two
 % rotations, a scale, and a translation
+%Perform the SVD decomposition
+%https://www.lucidar.me/en/mathematics/singular-value-decomposition-of-a-2x2-matrix/
+[U, SIG, V] = svd2x2(A);
+
+%Using the following reference to perform the transformations
+%https://es.mathworks.com/help/images/matrix-representation-of-geometric-transformations.html
+%Rotation 1
+R1  = [V' zeros(length(V'),1); zeros(1,length(V')) ones(1,1)];
+%Scale
+S = [SIG zeros(length(SIG),1); zeros(1,length(SIG)) ones(1,1)];
+%Rotation 2
+R2 =[U zeros(length( U),1); zeros(1,length(U)) ones(1,1)];
+%Translation
+T = [1 0 0; 0 1 0; 1 0 1];
+
 
 % ToDo: verify that the product of the four previous transformations
 % produces the same matrix H as above
@@ -50,8 +81,23 @@ figure; imshow(I); figure; imshow(uint8(I2));
 
 % ToDo: generate a matrix H which produces a projective transformation
 
+A  = [pi/4 0; 1 pi/6];
+
+%H = [1000*A [1 0]'; [1 0.5] 1];
+%H = [1.707 0.586 1; 2.707 8.242 2; 0.01 0.01 1];
+H = [0.6 0.001 -0.001; 0 0.9 -0.001; 0 0.1 1]
+
+if det(H) ~= 0
+    disp('OK: The matrix H is non-singular')
+else
+    disp('ERROR: The matrix H is not non-singular')
+    return
+end
+>>>>>>> Stashed changes
+
 I2 = apply_H(I, H);
-figure; imshow(I); figure; imshow(uint8(I2));
+%figure; imshow(I);
+figure; imshow(uint8(I2));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Affine Rectification
@@ -62,16 +108,16 @@ I=imread('Data/0000_s.png');
 A = load('Data/0000_s_info_lines.txt');
 
 % indices of lines
-i = 424;
+i = 493;
 p1 = [A(i,1) A(i,2) 1]';
 p2 = [A(i,3) A(i,4) 1]';
-i = 240;
+i = 186;
 p3 = [A(i,1) A(i,2) 1]';
 p4 = [A(i,3) A(i,4) 1]';
-i = 712;
+i = 48;
 p5 = [A(i,1) A(i,2) 1]';
 p6 = [A(i,3) A(i,4) 1]';
-i = 565;
+i = 508;
 p7 = [A(i,1) A(i,2) 1]';
 p8 = [A(i,3) A(i,4) 1]';
 
