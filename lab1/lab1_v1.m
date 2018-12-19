@@ -125,19 +125,18 @@ I=imread('Data/0000_s.png');
 A = load('Data/0000_s_info_lines.txt');
 
 % Indices of lines
-i = 424;
+i = 227;
 p1 = [A(i,1) A(i,2) 1]';
 p2 = [A(i,3) A(i,4) 1]';
-i = 240;
+i = 367;
 p3 = [A(i,1) A(i,2) 1]';
 p4 = [A(i,3) A(i,4) 1]';
-i = 712;
+i = 534;
 p5 = [A(i,1) A(i,2) 1]';
 p6 = [A(i,3) A(i,4) 1]';
-i = 565;
+i = 576;
 p7 = [A(i,1) A(i,2) 1]';
 p8 = [A(i,3) A(i,4) 1]';
-
 
 % ToDo: compute the lines l1, l2, l3, l4, that pass through the different pairs of points
 l1 = cross(p1, p2);
