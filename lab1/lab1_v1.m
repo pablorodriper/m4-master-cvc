@@ -420,9 +420,6 @@ plot(t+1-min_col2, 1-min_row2-(lr5(1)*t + lr5(3)) / lr5(2), 'c');
 plot(t+1-min_col2, 1-min_row2-(lr6(1)*t + lr6(3)) / lr6(2), 'c');
 hold off
 
-%Punto 3
-Ha = H;
-
 %1. l1 l3 be the image of two lines that are orthogonal in the world.
 %MX = b
 M = [lr1(1)*lr3(1) lr1(1)*lr3(2)+lr1(2)*lr3(1); lr5(1)*lr6(1) lr5(1)*lr6(2)+lr5(2)*lr6(1)];
