@@ -45,7 +45,7 @@ I=imread('Data/0005_s.png'); % we have to be in the proper folder
 
 % ToDo: generate a matrix H which produces an affine transformation
 
-A = [2 -1; 2 1]
+A = [2 -1; 2 1];
 
 H1 = [A [1 0]'; zeros(1,length(A)) 1];
 
@@ -140,7 +140,6 @@ p8 = [A(i,3) A(i,4) 1]';
 
 
 % ToDo: compute the lines l1, l2, l3, l4, that pass through the different pairs of points
-
 l1 = cross(p1, p2);
 l2 = cross(p3, p4);
 l3 = cross(p5, p6);
@@ -148,7 +147,6 @@ l4 = cross(p7, p8);
 
 
 % Show the chosen lines in the image
-
 figure; imshow(I); title('Original image 0000\_s.png');
 hold on;
 t=1:0.1:1000;
@@ -172,7 +170,6 @@ I2 = apply_H(I, H);
 figure; imshow(uint8(I2)); title('Affine Rectification')
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
-
 lr1 = H.'\l1;
 lr2 = H.'\l2;
 lr3 = H.'\l3;
@@ -252,7 +249,6 @@ p8 = [A(i,3) A(i,4) 1]';
 
 
 % ToDo: compute the lines l1, l2, l3, l4, that pass through the different pairs of points
-
 l1 = cross(p1, p2);
 l2 = cross(p3, p4);
 l3 = cross(p5, p6);
@@ -268,7 +264,6 @@ l_inf = [l_inf(1)/l_inf(3) l_inf(2)/l_inf(3) 1]';
 Ha = [1 0 0; 0 1 0; l_inf(1) l_inf(2) l_inf(3)];
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
-
 lr1 = Ha'\l1;
 lr2 = Ha'\l2;
 lr3 = Ha'\l3;
@@ -332,7 +327,6 @@ cos_4_r = (nr4*nr3')/(sqrt(nr4*nr4')*sqrt(nr3*nr3'))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. Affine and Metric Rectification of the left facade of image 0001
-close all
 clear all
 % ToDo: Write the code that rectifies the left facade of image 0001 with
 %       the stratified method (affine + metric). 
@@ -362,7 +356,6 @@ p7 = [A(i,1) A(i,2) 1]';
 p8 = [A(i,3) A(i,4) 1]';
 
 % ToDo: compute the lines l1, l2, l3, l4, that pass through the different pairs of points
-
 l1 = cross(p1, p2);
 l2 = cross(p3, p4);
 l3 = cross(p5, p6);
@@ -400,7 +393,6 @@ H = [1 0 0; 0 1 0; l_inf(1) l_inf(2) l_inf(3)];
 [I2, min_row2, min_col2] = apply_H(I, H);
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
-
 lr1 = H.'\l1;
 lr2 = H.'\l2;
 lr3 = H.'\l3;
