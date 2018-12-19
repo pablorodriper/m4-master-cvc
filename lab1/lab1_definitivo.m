@@ -40,13 +40,7 @@ figure; imshow(uint8(I_rotate_mirror)); title('45 degrees + horizontal mirroring
 
 
 %% 1.2. Affinities
-
-% ToDo: generate a matrix H which produces an affine transformation
-
-I=imread('Data/0005_s.png'); % we have to be in the proper folder
-
-%% 1.2. Affinities
-
+clear all
 I=imread('Data/0005_s.png'); % we have to be in the proper folder
 
 % ToDo: generate a matrix H which produces an affine transformation
@@ -98,18 +92,16 @@ else
     disp('ERROR: I3 and I4 are not equal')
     return
 end
-%figure; imshow(I); 
+
 figure; imshow(uint8(I_affin)); title('Affine transformation from SVD');
 
 %% 1.3 Projective transformations (homographies)
+clear all
+I=imread('Data/0005_s.png'); % we have to be in the proper folder
 
 % ToDo: generate a matrix H which produces a projective transformation
 
-A  = [pi/4 0; 1 pi/6];
-
-%H = [1000*A [1 0]'; [1 0.5] 1];
-%H = [1.707 0.586 1; 2.707 8.242 2; 0.01 0.01 1];
-H = [0.6 0.001 -0.001; 0 0.9 -0.001; 0 0.1 1]
+H = [14.707 0.586 1; 2.707 7.242 2; 0.01 0.01 1];
 
 if det(H) ~= 0
     disp('OK: The matrix H is non-singular')
@@ -118,9 +110,11 @@ else
     return
 end
 
-I2 = apply_H(I, H);
-%figure; imshow(I);
-figure; imshow(uint8(I2));
+I_projective = apply_H(I, H);
+
+% Plot
+%figure; imshow(I); title('Original image 0005_s.png');
+figure; imshow(uint8(I_projective)); title('Projective Transformation');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Affine Rectification
