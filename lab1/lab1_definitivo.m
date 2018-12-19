@@ -14,20 +14,28 @@
 
 
 %% 1.1. Similarities
-I=imread('Data/0005_s.png'); % we have to be in the proper folder
+I=imread('Data/0005_s.png');
 
 % ToDo: generate a matrix H which produces a similarity transformation
 
+% Parameters
 sigma = pi/4;
 s = 0.8;
 
+% Rotation matrix
 R  = [cos(sigma) -sin(sigma);sin(sigma) cos(sigma)];
-R2 = [1 0; 0 -1];       % mirroring
-H = [s.*R*R2 zeros(length(R),1); zeros(1,length(R)) 1];
+R_mirror = [1 0; 0 -1];  
 
-I2 = apply_H(I, H);
+H = [s.*R zeros(length(R),1); zeros(1,length(R)) 1];
+H2 = [s.*R*R_mirror zeros(length(R),1); zeros(1,length(R)) 1];
 
-figure; imshow(I); figure; imshow(uint8(I2));
+I_rotate = apply_H(I, H);
+I_rotate_mirror = apply_H(I, H2);
+
+% Plot
+figure; imshow(I); title('Original image 0005_s.png');
+figure; imshow(uint8(I_rotate)); title('45 degrees');
+figure; imshow(uint8(I_rotate_mirror)); title('45 degrees + horizontal mirroring');
 
 
 %% 1.2. Affinities
