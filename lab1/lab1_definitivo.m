@@ -34,7 +34,7 @@ I_rotate = apply_H(I, H);
 I_rotate_mirror = apply_H(I, H2);
 
 % Plot
-figure; imshow(I); title('Original image 0005_s.png');
+figure; imshow(I); title('Original image 0005\_s.png');
 figure; imshow(uint8(I_rotate)); title('45 degrees');
 figure; imshow(uint8(I_rotate_mirror)); title('45 degrees + horizontal mirroring');
 
@@ -52,7 +52,7 @@ H1 = [A [1 0]'; zeros(1,length(A)) 1];
 I_affin = apply_H(I, H1);
 
 % Plot 
-%figure; imshow(I); title('Original image 0005_s.png');
+%figure; imshow(I); title('Original image 0005\_s.png');
 figure; imshow(uint8(I_affin)); title('Affine transformation');
 
 % ToDo: decompose the affinity in four transformations: two
@@ -113,17 +113,18 @@ end
 I_projective = apply_H(I, H);
 
 % Plot
-%figure; imshow(I); title('Original image 0005_s.png');
+%figure; imshow(I); title('Original image 0005\_s.png');
 figure; imshow(uint8(I_projective)); title('Projective Transformation');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Affine Rectification
+clear all
 
-% choose the image points
+% Choose the image points
 I=imread('Data/0000_s.png');
 A = load('Data/0000_s_info_lines.txt');
 
-% indices of lines
+% Indices of lines
 i = 424;
 p1 = [A(i,1) A(i,2) 1]';
 p2 = [A(i,3) A(i,4) 1]';
@@ -146,8 +147,9 @@ l3 = cross(p5, p6);
 l4 = cross(p7, p8);
 
 
-% show the chosen lines in the image
-figure;imshow(I);
+% Show the chosen lines in the image
+
+figure; imshow(I); title('Original image 0000\_s.png');
 hold on;
 t=1:0.1:1000;
 plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
@@ -161,16 +163,13 @@ plot(t, -(l4(1)*t + l4(3)) / l4(2), 'y');
 v1 = cross(l1, l2);
 v2 = cross(l3, l4);
 
-
 %Vanishing line
 l_inf = cross(v1, v2);
 l_inf = [l_inf(1)/l_inf(3) l_inf(2)/l_inf(3) 1]';
 
-A  = [2 2; -1 1];    
-H1 = [A [1 0]'; zeros(1,length(A)) ones(1,1)];
-H = [1 0 0; 0 1 0; l_inf(1) l_inf(2) l_inf(3)]; %H = H_aff*[]
+H = [1 0 0; 0 1 0; l_inf(1) l_inf(2) l_inf(3)];
 I2 = apply_H(I, H);
-figure; imshow(uint8(I2));
+figure; imshow(uint8(I2)); title('Affine Rectification')
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
 
@@ -180,7 +179,7 @@ lr3 = H.'\l3;
 lr4 = H.'\l4;
 
 % show the transformed lines in the transformed image
-figure;imshow(uint8(I2));
+figure;imshow(uint8(I2)); title('Affine Rectification with lines')
 hold on;
 t=1:0.1:1000;
 plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
@@ -212,7 +211,6 @@ nr1 = [lr1(1)/lr1(3), lr1(2)/lr1(3)];
 nr2 = [lr2(1)/lr2(3), lr2(2)/lr2(3)];
 nr3 = [lr3(1)/lr3(3), lr3(2)/lr3(3)];
 nr4 = [lr4(1)/lr4(3), lr4(2)/lr4(3)];
-
 
 cos_1_r = (nr1*nr3')/(sqrt(nr1*nr1')*sqrt(nr3*nr3'))
 cos_2_r = (nr2*nr4')/(sqrt(nr2*nr2')*sqrt(nr4*nr4'))
