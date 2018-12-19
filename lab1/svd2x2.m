@@ -23,6 +23,6 @@ svals= [sqrt((SUsum+SUdif)/2) sqrt((SUsum-SUdif)/2)];
 SIG =diag(svals);
 
 % Find the correction matrix for the right side
-S = U'*A*W
+S = U'*A*W;
 C = diag([sign(S(1,1)) sign(S(2,2))]);
 V = W*C;
