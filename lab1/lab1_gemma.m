@@ -259,45 +259,26 @@ clear all
 %       Show the (properly) transformed lines that use in every step.
 
 
-% % indices of lines
-% I=imread('Data/0001_s.png');
-% A = load('Data/0001_s_info_lines.txt');
-% 
-% I = I(:,1:450,:);
-% figure; imshow(I);
-% 
-% % indices of lines
-% i = 614;
-% p1 = [A(i,1) A(i,2) 1]';
-% p2 = [A(i,3) A(i,4) 1]';
-% i = 159;
-% p3 = [A(i,1) A(i,2) 1]';
-% p4 = [A(i,3) A(i,4) 1]';
-% i = 645;
-% p5 = [A(i,1) A(i,2) 1]';
-% p6 = [A(i,3) A(i,4) 1]';
-% i = 541;
-% p7 = [A(i,1) A(i,2) 1]';
-% p8 = [A(i,3) A(i,4) 1]';
+% Indices of lines
+I=imread('Data/0001_s.png');
+A = load('Data/0001_s_info_lines.txt');
 
-I=imread('Data/0000_s.png');
-A = load('Data/0000_s_info_lines.txt');
+I = I(:,1:450,:);
+figure; imshow(I); title('Original image 0001\_s resized.png');
 
-% indices of lines
-i = 424;
+% Indices of lines
+i = 614;
 p1 = [A(i,1) A(i,2) 1]';
 p2 = [A(i,3) A(i,4) 1]';
-i = 240;
+i = 159;
 p3 = [A(i,1) A(i,2) 1]';
 p4 = [A(i,3) A(i,4) 1]';
-i = 712;
+i = 645;
 p5 = [A(i,1) A(i,2) 1]';
 p6 = [A(i,3) A(i,4) 1]';
-i = 565;
+i = 541;
 p7 = [A(i,1) A(i,2) 1]';
 p8 = [A(i,3) A(i,4) 1]';
-
-
 
 % ToDo: compute the lines l1, l2, l3, l4, that pass through the different pairs of points
 
@@ -306,7 +287,7 @@ l2 = cross(p3, p4);
 l3 = cross(p5, p6);
 l4 = cross(p7, p8);
 
-%Crossed lines
+% Crossed lines
 p9 = cross(l1, l3);
 p10 = cross(l1, l4);
 p11 = cross(l2, l3);
@@ -314,8 +295,8 @@ p12 = cross(l2, l4);
 l5 = cross(p9, p12);
 l6 = cross(p10, p11);
 
-% show the chosen lines in the image
-figure;imshow(I);
+% Show the chosen lines in the image
+figure;imshow(I); title('Original image 0001\_s resized with lines.png'); 
 hold on;
 t=1:0.1:1000;
 plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
@@ -326,18 +307,16 @@ hold off
 
 % ToDo: compute the homography that affinely rectifies the image
 
-%Vanishing points provided by each pair of parallel lines
+% Vanishing points provided by each pair of parallel lines
 v1 = cross(l1, l2);
 v2 = cross(l3, l4);
 
-
-%Vanishing line
+% Vanishing line
 l_inf = cross(v1, v2);
 l_inf = [l_inf(1)/l_inf(3) l_inf(2)/l_inf(3) 1]';
 
 H = [1 0 0; 0 1 0; l_inf(1) l_inf(2) l_inf(3)];
 [I2, min_row2, min_col2] = apply_H(I, H);
-%figure; imshow(uint8(I2));
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
 
@@ -348,8 +327,8 @@ lr4 = H.'\l4;
 lr5 = H.'\l5;
 lr6 = H.'\l6;
 
-% show the transformed lines in the transformed image
-figure;imshow(uint8(I2));
+% Show the transformed lines in the transformed image
+figure;imshow(uint8(I2)); title('Affine Rectification with Lines')
 hold on;
 t=1:0.1:1000;
 plot(t+1-min_col2, 1-min_row2-(lr1(1)*t + lr1(3)) / lr1(2), 'y');
@@ -360,51 +339,23 @@ plot(t+1-min_col2, 1-min_row2-(lr5(1)*t + lr5(3)) / lr5(2), 'c');
 plot(t+1-min_col2, 1-min_row2-(lr6(1)*t + lr6(3)) / lr6(2), 'c');
 hold off
 
-
-
 %Punto 3
-
 Ha = H;
-
-
-
 
 %1. l1 l3 be the image of two lines that are orthogonal in the world.
 %MX = b
 M = [lr1(1)*lr3(1) lr1(1)*lr3(2)+lr1(2)*lr3(1); lr5(1)*lr6(1) lr5(1)*lr6(2)+lr5(2)*lr6(1)];
 b = [-lr1(2)*lr3(2) -lr5(2)*lr6(2)];
-X = M\b'
+X = M\b';
+
 % Set matrix S
-
-S = [X(1) X(2); X(2) 1]
-
-
-% EPS = 10^-6;
-% [v, d] = eig(S); %CALCULATE EIGENVECTOR AND EIGENVALUES 
-% d=diag(d);          %GET A VECTOR OF EIGENVALUES 
-% d(d<=0)=EPS; %FIND ALL EIGENVALUES<=ZERO AND CHANGE THEM FOR EPS 
-%      
-% d=diag(d);      %CONVERT VECTOR d INTO A MATRIX 
-% S = v*d*v'
-
+S = [X(1) X(2); X(2) 1];
 K = chol(S, 'lower')
-% [U,D,V] = svd(S)
-% sqrtD = sqrt(D)
-% U_T = transpose(U)
-% A = U_T*sqrtD
-% K = A*V
-% S1 = K*K'
+
 Hs_a = [K [0; 0]; [0 0] 1]
-% if Hs_a(1,1) < 0
-%     Hs_a(1,1) = -Hs_a(1,1)
-% 
-% elseif Hs_a(2,2) < 0
-%     Hs_a(2,2) = -Hs_a(2,2)
-% end
 Ha_s = inv(Hs_a)
 [I3, min_row3, min_col3] = apply_H(I2, Ha_s);
-%temp = maketform('affine',Ha_s)
-%I3 = imtransform(I2, temp);
+
 lrr1 = Hs_a.'*lr1;
 lrr2 = Hs_a.'*lr2;
 lrr3 = Hs_a.'*lr3;
@@ -412,9 +363,7 @@ lrr4 = Hs_a.'*lr4;
 lrr5 = Hs_a.'*lr5;
 lrr6 = Hs_a.'*lr6;
 
-
-%figure;imshow(I);
-figure; imshow(uint8(I3));
+figure; imshow(uint8(I3)); title('Metric Rectification with Lines')
 hold on;
 t=1:0.1:1000;
 plot(t+1-min_col3, 1-min_row3-(lrr1(1)*t + lrr1(3)) / lrr1(2), 'y');
