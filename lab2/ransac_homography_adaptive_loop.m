@@ -1,5 +1,7 @@
 function [H, idx_inliers] = ransac_homography_adaptive_loop(x1, x2, th, max_it)
 
+% Complete algorithm: Algorithm 7.1, Hartley-Zisserman book, page 181
+
 [Ncoords, Npoints] = size(x1);
 
 % ransac
