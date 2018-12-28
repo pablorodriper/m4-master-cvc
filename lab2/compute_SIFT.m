@@ -1,4 +1,4 @@
-function compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb)
+function compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb, plot_figures)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Compute image correspondences
@@ -8,31 +8,36 @@ function compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb)
 [points_b, desc_b] = sift(imb, 'Threshold', 0.01);
 [points_c, desc_c] = sift(imc, 'Threshold', 0.01);
 
-figure;
-imshow(imargb);%image(imargb)
-hold on;
-plot(points_a(1,:), points_a(2,:),'+y');
-figure;
-imshow(imbrgb);%image(imbrgb);
-hold on;
-plot(points_b(1,:), points_b(2,:),'+y');
-figure;
-imshow(imcrgb);%image(imcrgb);
-hold on;
-plot(points_c(1,:), points_c(2,:),'+y');
+if(plot_figures == 1)
+    figure;
+    imshow(imargb);%image(imargb)
+    hold on;
+    plot(points_a(1,:), points_a(2,:),'+y');
+    figure;
+    imshow(imbrgb);%image(imbrgb);
+    hold on;
+    plot(points_b(1,:), points_b(2,:),'+y');
+    figure;
+    imshow(imcrgb);%image(imcrgb);
+    hold on;
+    plot(points_c(1,:), points_c(2,:),'+y');
+end
 
 %% Match SIFT keypoints 
 
 % between a and b
 matches_ab = siftmatch(desc_a, desc_b);
-figure;
-plotmatches(ima, imb, points_a(1:2,:), points_b(1:2,:), matches_ab, 'Stacking', 'v');
+if(plot_figures == 1)
+    figure;
+    plotmatches(ima, imb, points_a(1:2,:), points_b(1:2,:), matches_ab, 'Stacking', 'v');
+end
 
 % between b and c
 matches_bc = siftmatch(desc_b, desc_c);
-figure;
-plotmatches(imb, imc, points_b(1:2,:), points_c(1:2,:), matches_bc, 'Stacking', 'v');
-
+if(plot_figures == 1)
+    figure;
+    plotmatches(imb, imc, points_b(1:2,:), points_c(1:2,:), matches_bc, 'Stacking', 'v');
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Compute the homography (DLT algorithm) between image pairs
 
