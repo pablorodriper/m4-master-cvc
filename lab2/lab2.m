@@ -19,7 +19,7 @@ ima = sum(double(imargb), 3) / 3 / 255;
 imb = sum(double(imbrgb), 3) / 3 / 255;
 imc = sum(double(imcrgb), 3) / 3 / 255;
 
-compute_SIFT(ima, imb, imc)
+compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb)
 
 %% ToDo: compute the mosaic with castle_int images
 
@@ -30,7 +30,7 @@ ima = sum(double(imargb), 3) / 3 / 255;
 imb = sum(double(imbrgb), 3) / 3 / 255;
 imc = sum(double(imcrgb), 3) / 3 / 255;
 
-compute_SIFT(ima, imb, imc)
+compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb)
 
 %% ToDo: compute the mosaic with aerial images set 13
 
@@ -41,7 +41,7 @@ ima = sum(double(imargb), 3) / 3 / 255;
 imb = sum(double(imbrgb), 3) / 3 / 255;
 imc = sum(double(imcrgb), 3) / 3 / 255;
 
-compute_SIFT(ima, imb, imc)
+compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb)
 
 %% ToDo: compute the mosaic with aerial images set 22
 
@@ -52,7 +52,7 @@ ima = imargb;
 imb = imbrgb;
 imc = imcrgb;
 
-compute_SIFT(ima, imb, imc)
+compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb)
 
 %% ToDo: comment the results in every of the four cases: say why it works or does not work
 

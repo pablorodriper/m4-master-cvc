@@ -1,4 +1,4 @@
-function compute_SIFT(ima, imb, imc)
+function compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Compute image correspondences
@@ -64,9 +64,9 @@ vgg_gui_H(imbrgb, imcrgb, Hbc);
 %% 3. Build the mosaic
 
 corners = [-400 1200 -100 650];
-iwb = apply_H_v2(imbrgb, ?? , corners);  % Pablo: ?Hbc?  % ToDo: complete the call to the function
-iwa = apply_H_v2(imargb, ??, corners);                  % ToDo: complete the call to the function
-iwc = apply_H_v2(imcrgb, ??, corners);                  % ToDo: complete the call to the function
+iwb = apply_H_v2(imbrgb, 'ToDo', corners);  % Pablo: ?Hbc?  % ToDo: complete the call to the function
+iwa = apply_H_v2(imargb, 'ToDo', corners);                  % ToDo: complete the call to the function
+iwc = apply_H_v2(imcrgb, 'ToDo', corners);                  % ToDo: complete the call to the function
 
 figure;
 imshow(max(iwc, max(iwb, iwa)));%image(max(iwc, max(iwb, iwa)));axis off;

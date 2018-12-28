@@ -1,4 +1,4 @@
-function H = homography2d(x1, x2)
+function H = homography2d(x1_points, x2_points)
 
 
 return
