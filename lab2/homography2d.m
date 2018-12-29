@@ -1,4 +1,5 @@
 function H = homography2d(x1_points, x2_points)
+% This function calculates H such as x2 = H*x1
 
 % Normalise each set of points
 [x1_norm, T1] = normalise2dpts(x1_points);
