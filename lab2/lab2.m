@@ -11,7 +11,7 @@ plot_figures = false;
 %% 1, 2 and 3 moved to function compute_SIFT()
 
 %% ToDo: mosaic llanes
-
+close all
 imargb = imread('Data/llanes/llanes_a.jpg');
 imbrgb = imread('Data/llanes/llanes_b.jpg');
 imcrgb = imread('Data/llanes/llanes_c.jpg');

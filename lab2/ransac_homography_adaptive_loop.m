@@ -21,7 +21,7 @@ while it < max_it
     % update estimate of max_it (the number of trials) to ensure we pick, 
     % with probability p, an initial data set with no outliers
     fracinliers =  length(inliers)/Npoints;
-    pNoOutliers = 1 -  fracinliers^4;
+    pNoOutliers = 1 - fracinliers^4;
     pNoOutliers = max(eps, pNoOutliers);  % avoid division by -Inf
     pNoOutliers = min(1-eps, pNoOutliers);% avoid division by 0
     p=0.99;
@@ -42,9 +42,18 @@ function idx_inliers = compute_inliers(H, x1, x2, th)
         return
     end
     
-
-    % compute the symmetric geometric error
-    d2 = 'toDo'   % ToDo
+    % calculate, in both directions, the transfered points    
+    Hx1    = H*x1;
+    invHx2 = H\x2;
+    
+    % Normalise so that the homogeneous scale parameter for all coordinates is 1.
+    x1     = normalise(x1);
+    x2     = normalise(x2);     
+    Hx1    = normalise(Hx1);
+    invHx2 = normalise(invHx2); 
+    
+    % Compute the symmetric geometric error
+    d2 = sum((x1-invHx2).^2) + sum((x2-Hx1).^2); % ToDo
     idx_inliers = find(d2 < th.^2);
 
 

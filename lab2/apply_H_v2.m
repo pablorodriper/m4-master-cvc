@@ -13,7 +13,7 @@ function I2=apply_H_v2(I, H, corners)
 
 % input image size
 [nrows, ncols, nchan] = size(I);
- 
+    
 xmin = corners(1);
 xmax = corners(2);
 ymin = corners(3);
@@ -34,8 +34,9 @@ Zs = reshape(Z,1,Hnrows*Hncols);
 XYZs = [Xs; Ys; Zs];
 
 % transform image
-Hi = inv(H);
-HiXYZs = Hi*XYZs;
+%Hi = inv(H);
+%HiXYZs = Hi*XYZs;
+HiXYZs = H\XYZs;
 HX = reshape(HiXYZs(1,:),Hnrows,Hncols);
 HY = reshape(HiXYZs(2,:),Hnrows,Hncols);
 HZ = reshape(HiXYZs(3,:),Hnrows,Hncols);
