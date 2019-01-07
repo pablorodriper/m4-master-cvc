@@ -9,7 +9,7 @@ it = 0;
 best_inliers = [];
 while it < max_it
     
-    points = randomsample(Npoints, 4);
+    points = randomsample(Npoints, 4);  % 4 is the necessary point correspondences to constrain H
     H = homography2d(x1(:,points), x2(:,points)); % ToDo: you have to create this function
     inliers = compute_inliers(H, x1, x2, th);
     
@@ -29,10 +29,10 @@ while it < max_it
     
     it = it + 1;
 end
-
 % compute H from all the inliers
 H = homography2d(x1(:,best_inliers), x2(:,best_inliers));
 idx_inliers = best_inliers;
+%rank(H)
 
 
 function idx_inliers = compute_inliers(H, x1, x2, th)

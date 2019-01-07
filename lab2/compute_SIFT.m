@@ -8,7 +8,7 @@ function compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb, plot_figures)
 [points_b, desc_b] = sift(imb, 'Threshold', 0.01);
 [points_c, desc_c] = sift(imc, 'Threshold', 0.01);
 
-if(plot_figures == 0)
+if(plot_figures == 1)
     figure;
     subplot(1,3,1)
     imshow(imargb);%image(imargb)
@@ -75,9 +75,9 @@ end
 %% 3. Build the mosaic
 
 corners = [-400 1200 -100 650];
-iwb = apply_H_v2(imbrgb, Hab\Hbc, corners);                  % ToDo: complete the call to the function
+iwb = apply_H_v2(imbrgb, eye(size(Hab)), corners);              % ToDo: complete the call to the function
 iwa = apply_H_v2(imargb, Hab, corners);                  % ToDo: complete the call to the function
-iwc = apply_H_v2(imcrgb, inv(Hbc), corners);                     % ToDo: complete the call to the function
+iwc = apply_H_v2(imcrgb, inv(Hbc), corners);             % ToDo: complete the call to the function
 
 figure;
 imshow(max(iwc, max(iwb, iwa)));%image(max(iwc, max(iwb, iwa)));

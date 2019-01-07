@@ -124,9 +124,9 @@ plot(xhatp(1,:), xhatp(2,:),'+c');
 
 %% Build mosaic
 corners = [-400 1200 -100 650];
-iwb = apply_H_v2(imbrgb, ??, corners); % ToDo: complete the call to the function
-iwa = apply_H_v2(imargb, ??, corners); % ToDo: complete the call to the function
-iwc = apply_H_v2(imcrgb, ??, corners); % ToDo: complete the call to the function
+iwb = apply_H_v2(imbrgb, eye(size(Hab_r)), corners); % ToDo: complete the call to the function
+iwa = apply_H_v2(imargb, Hab_r, corners); % ToDo: complete the call to the function
+iwc = apply_H_v2(imcrgb, inv(Hbc_r), corners); % ToDo: complete the call to the function
 
 figure;
 imshow(max(iwc, max(iwb, iwa)));%image(max(iwc, max(iwb, iwa)));axis off;
