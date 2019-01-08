@@ -62,8 +62,8 @@ compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb, plot_figures)
 
 % Homography ab
 
-x = ...;  %ToDo: set the non-homogeneous point coordinates of the 
-xp = ...; %      point correspondences we will refine with the geometric method
+x = points_a(1:2, matches_ab(1,inliers_ab));  %ToDo: set the non-homogeneous point coordinates of the 
+xp = points_b(1:2, matches_ab(2,inliers_ab)); %      point correspondences we will refine with the geometric method
 Xobs = [ x(:) ; xp(:) ];     % The column vector of observed values (x and x')
 P0 = [ Hab(:) ; x(:) ];      % The parameters or independent variables
 
@@ -88,17 +88,17 @@ fprintf(1, 'Gold standard reproj error initial %f, final %f\n', err_initial, err
 % ToDo: compute the points xhat and xhatp which are the correspondences
 % returned by the refinement with the Gold Standard algorithm
 
-figure;
-imshow(imargb);%image(imargb);
-hold on;
-plot(x(1,:), x(2,:),'+y');
-plot(xhat(1,:), xhat(2,:),'+c');
-
-figure;
-imshow(imbrgb);%image(imbrgb);
-hold on;
-plot(xp(1,:), xp(2,:),'+y');
-plot(xhatp(1,:), xhatp(2,:),'+c');
+% figure;
+% imshow(imargb);%image(imargb);
+% hold on;
+% plot(x(1,:), x(2,:),'+y');
+% plot(xhat(1,:), xhat(2,:),'+c');
+% 
+% figure;
+% imshow(imbrgb);%image(imbrgb);
+% hold on;
+% plot(xp(1,:), xp(2,:),'+y');
+% plot(xhatp(1,:), xhatp(2,:),'+c');
 
 %%  Homography bc
 
@@ -122,15 +122,15 @@ hold on;
 plot(xp(1,:), xp(2,:),'+y');
 plot(xhatp(1,:), xhatp(2,:),'+c');
 
-%% Build mosaic
-corners = [-400 1200 -100 650];
-iwb = apply_H_v2(imbrgb, ??, corners); % ToDo: complete the call to the function
-iwa = apply_H_v2(imargb, ??, corners); % ToDo: complete the call to the function
-iwc = apply_H_v2(imcrgb, ??, corners); % ToDo: complete the call to the function
-
-figure;
-imshow(max(iwc, max(iwb, iwa)));%image(max(iwc, max(iwb, iwa)));axis off;
-title('Mosaic A-B-C');
+% %% Build mosaic
+% corners = [-400 1200 -100 650];
+% iwb = apply_H_v2(imbrgb, ??, corners); % ToDo: complete the call to the function
+% iwa = apply_H_v2(imargb, ??, corners); % ToDo: complete the call to the function
+% iwc = apply_H_v2(imcrgb, ??, corners); % ToDo: complete the call to the function
+% 
+% figure;
+% imshow(max(iwc, max(iwb, iwa)));%image(max(iwc, max(iwb, iwa)));axis off;
+% title('Mosaic A-B-C');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. OPTIONAL: Calibration with a planar pattern
