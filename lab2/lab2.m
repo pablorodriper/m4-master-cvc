@@ -3,7 +3,7 @@
 
 addpath('Data')
 addpath('sift')
-plot_figures = false;
+plot_figures = true;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Lab 2: Image mosaics
 
@@ -22,7 +22,7 @@ imc = sum(double(imcrgb), 3) / 3 / 255;
 compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb, plot_figures)
 
 %% ToDo: compute the mosaic with castle_int images
-
+close all
 imargb = imread('Data/castle_int/0016_s.png');
 imbrgb = imread('Data/castle_int/0015_s.png');
 imcrgb = imread('Data/castle_int/0014_s.png');
@@ -33,7 +33,7 @@ imc = sum(double(imcrgb), 3) / 3 / 255;
 compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb, plot_figures)
 
 %% ToDo: compute the mosaic with aerial images set 13
-
+close all
 imargb = imread('Data/aerial/site13/frame00000.png');
 imbrgb = imread('Data/aerial/site13/frame00002.png');
 imcrgb = imread('Data/aerial/site13/frame00003.png');
