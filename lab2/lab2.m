@@ -2,12 +2,12 @@
 
 addpath('Data')
 addpath('sift')
-plot_figures = true;
+plot_figures = true;    % if false, reduce the number of plotted figures
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Lab 2: Image mosaics
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Tasks 1, 2, 3 and 4 moved to function compute_SIFT()
+%% Tasks 1, 2, 3 and 4 moved to function construct_mosaics()
 
 %% ToDo: mosaic llanes
 close all
@@ -18,7 +18,7 @@ ima = sum(double(imargb), 3) / 3 / 255;
 imb = sum(double(imbrgb), 3) / 3 / 255;
 imc = sum(double(imcrgb), 3) / 3 / 255;
 
-compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb, plot_figures, 'llanes')
+construct_mosaics(ima, imb, imc, imargb, imbrgb, imcrgb, plot_figures, 'llanes')
 
 %% ToDo: compute the mosaic with castle_int images
 close all
@@ -29,7 +29,7 @@ ima = sum(double(imargb), 3) / 3 / 255;
 imb = sum(double(imbrgb), 3) / 3 / 255;
 imc = sum(double(imcrgb), 3) / 3 / 255;
 
-compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb, plot_figures, 'castle')
+construct_mosaics(ima, imb, imc, imargb, imbrgb, imcrgb, plot_figures, 'castle')
 
 %% ToDo: compute the mosaic with aerial images set 13
 close all
@@ -40,7 +40,7 @@ ima = sum(double(imargb), 3) / 3 / 255;
 imb = sum(double(imbrgb), 3) / 3 / 255;
 imc = sum(double(imcrgb), 3) / 3 / 255;
 
-compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb, plot_figures, 'aerial_1')
+construct_mosaics(ima, imb, imc, imargb, imbrgb, imcrgb, plot_figures, 'aerial_1')
 
 %% ToDo: compute the mosaic with aerial images set 22
 close all
@@ -51,7 +51,7 @@ ima = imargb;
 imb = imbrgb;
 imc = imcrgb;
 
-compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb, plot_figures, 'aerial_2')
+construct_mosaics(ima, imb, imc, imargb, imbrgb, imcrgb, plot_figures, 'aerial_2')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. OPTIONAL: Calibration with a planar pattern

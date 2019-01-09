@@ -1,4 +1,4 @@
-function compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb, plot_figures, name)
+function construct_mosaics(ima, imb, imc, imargb, imbrgb, imcrgb, plot_figures, name)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Compute image correspondences
