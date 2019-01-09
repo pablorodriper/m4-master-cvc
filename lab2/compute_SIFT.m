@@ -1,4 +1,4 @@
-function compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb, plot_figures)
+function compute_SIFT(ima, imb, imc, imargb, imbrgb, imcrgb, plot_figures, name)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Compute image correspondences
@@ -33,15 +33,17 @@ end
 % between a and b
 matches_ab = siftmatch(desc_a, desc_b);
 if(plot_figures == 1)
-    figure;
+    fig = figure;
     plotmatches(ima, imb, points_a(1:2,:), points_b(1:2,:), matches_ab, 'Stacking', 'v');
+    %saveas(fig,strcat('results/',name,'_ab_with_outliers.png'))
 end
 
 % between b and c
 matches_bc = siftmatch(desc_b, desc_c);
 if(plot_figures == 1)
-    figure;
+    fig = figure;
     plotmatches(imb, imc, points_b(1:2,:), points_c(1:2,:), matches_bc, 'Stacking', 'v');
+    %saveas(fig,strcat('results/',name,'_bc_with_outliers.png'))
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Compute the homography (DLT algorithm) between image pairs
@@ -53,9 +55,10 @@ xab_b = [points_b(1:2, matches_ab(2,:)); ones(1, length(matches_ab))];
 [Hab, inliers_ab] = ransac_homography_adaptive_loop(xab_a, xab_b, th, 1000); % ToDo: complete this function
 
 if(plot_figures == 1)
-    figure;
+    fig = figure;
     plotmatches(ima, imb, points_a(1:2,:), points_b(1:2,:), ...
         matches_ab(:,inliers_ab), 'Stacking', 'v');
+    %saveas(fig,strcat('results/',name,'_ab_without_outliers.png'))
 
     vgg_gui_H(imargb, imbrgb, Hab);
 end
@@ -66,27 +69,32 @@ xbc_c = [points_c(1:2, matches_bc(2,:)); ones(1, length(matches_bc))];
 [Hbc, inliers_bc] = ransac_homography_adaptive_loop(xbc_b, xbc_c, th, 1000); 
 
 if(plot_figures == 1)
-    figure;
+    fig = figure;
     plotmatches(imb, imc, points_b(1:2,:), points_c(1:2,:), ...
         matches_bc(:,inliers_bc), 'Stacking', 'v');
+    %saveas(fig,strcat('results/',name,'_bc_without_outliers.png'))
+
 
     vgg_gui_H(imbrgb, imcrgb, Hbc);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Build the mosaic
 
-corners = [-400 1200 -100 650];             % llanes
-% corners = [-600 1600 -250 750];             % castle
-% corners = [-300 1300 -100 850];             % aerial 1
+if(strcmp(name,'llanes')) corners = [-400 1200 -100 650];             
+    elseif(strcmp(name,'castle')) corners = [-600 1600 -250 750];             
+    elseif(strcmp(name,'aerial_1')) corners = [-300 1300 -100 850];             
+    elseif(strcmp(name,'aerial_2')) corners = [-300 1300 -100 850]; 
+end            
 
 iwb = apply_H_v2(imbrgb, eye(size(Hab)), corners);       % ToDo: complete the call to the function
 iwa = apply_H_v2(imargb, Hab, corners);                  % ToDo: complete the call to the function
 iwc = apply_H_v2(imcrgb, inv(Hbc), corners);             % ToDo: complete the call to the function
 
-figure;
+fig = figure;
 imshow(max(iwc, max(iwb, iwa)));%image(max(iwc, max(iwb, iwa)));
 axis off;
 title('Mosaic A-B-C');
+%saveas(fig,strcat('results/',name,'_mosaic.png'))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. Refine the homography with the Gold Standard algorithm
@@ -123,21 +131,24 @@ xhat_hom = [xhat; ones(1, size(xhat, 2))]; %bring it to homogeneous coordinates
 
 xhatp = euclid(Hab_r*xhat_hom);
 
-figure;
+fig = figure;
 imshow(imargb);%image(imargb);
 hold on;
-plot(x(1,:), x(2,:),'+y');
-plot(xhat(1,:), xhat(2,:),'+c');
-title('Image A: original (yellow) and refined (blue) correspondences'); 
+plot(x(1,:), x(2,:),'xc', 'MarkerSize',20,'LineWidth',1);
+plot(xhat(1,:), xhat(2,:),'+r', 'MarkerSize',20,'LineWidth',1);
+title('Image A: original (blue) and refined (red) correspondences'); 
 hold off
+%saveas(fig,strcat('results/',name,'_points_ab_A.png'))
 
-figure;
+    
+fig = figure;
 imshow(imbrgb);%image(imbrgb);
 hold on;
-plot(xp(1,:), xp(2,:),'+y');
-plot(xhatp(1,:), xhatp(2,:),'+c');
-title('Image B: original (yellow) and refined (blue) correspondences');
+plot(xp(1,:), xp(2,:),'xc', 'MarkerSize',20,'LineWidth',1);
+plot(xhatp(1,:), xhatp(2,:),'+r', 'MarkerSize',20,'LineWidth',1);
+title('Image B: original (blue) and refined (red) correspondences');
 hold off
+%saveas(fig,strcat('results/',name,'_points_ab_B.png'))
 
 %%  Homography bc
 
@@ -176,30 +187,38 @@ xhat_hom = [xhat; ones(1, size(xhat, 2))]; %bring it to homogeneous coordinates
 
 xhatp = euclid(Hbc_r*xhat_hom);
 
-figure;
+fig = figure;
 imshow(imbrgb);%image(imbrgb);
 hold on;
-plot(x(1,:), x(2,:),'+y');
-plot(xhat(1,:), xhat(2,:),'+c');
-title('Image B: original (yellow) and refined (blue) correspondences'); 
+plot(x(1,:), x(2,:),'xc', 'MarkerSize',20,'LineWidth',1);
+plot(xhat(1,:), xhat(2,:),'+r', 'MarkerSize',20,'LineWidth',1);
+title('Image B: original (blue) and refined (red) correspondences'); 
 hold off;
+%saveas(fig,strcat('results/',name,'_points_bc_B.png'))
 
-figure;
+fig = figure;
 imshow(imcrgb);%image(imcrgb);
 hold on;
-plot(xp(1,:), xp(2,:),'+y');
-plot(xhatp(1,:), xhatp(2,:),'+c');
-title('Image C: original (yellow) and refined (blue) correspondences'); 
+plot(xp(1,:), xp(2,:),'xc', 'MarkerSize',20,'LineWidth',1);
+plot(xhatp(1,:), xhatp(2,:),'+r', 'MarkerSize',20,'LineWidth',1);
+title('Image C: original (blue) and refined (red) correspondences'); 
 hold off
+%saveas(fig,strcat('results/',name,'_points_bc_C.png'))
 
 %% Build mosaic
-corners = [-400 1200 -100 650];
+if(strcmp(name,'llanes')) corners = [-400 1200 -100 650];             
+    elseif(strcmp(name,'castle')) corners = [-600 1600 -250 750];             
+    elseif(strcmp(name,'aerial_1')) corners = [-300 1300 -100 850];             
+    elseif(strcmp(name,'aerial_2')) corners = [-300 1300 -100 850]; 
+end         
+
 iwb = apply_H_v2(imbrgb, eye(size(Hab_r)), corners); % ToDo: complete the call to the function
 iwa = apply_H_v2(imargb, Hab_r, corners); % ToDo: complete the call to the function
 iwc = apply_H_v2(imcrgb, inv(Hbc_r), corners); % ToDo: complete the call to the function
 
-figure;
+fig = figure;
 imshow(max(iwc, max(iwb, iwa)));%image(max(iwc, max(iwb, iwa)));axis off;
 title('Mosaic A-B-C');
+%saveas(fig,strcat('results/',name,'_mosaic_gold.png'))
 
 end
