@@ -9,10 +9,14 @@ norm_x2_t = norm_x2';
 norm_x1_t = norm_x1';
 
 for i=1:length(x1_test)
-    W(i,:) = [norm_x1_t(i,1)*norm_x2_t(i,1) norm_x1_t(i,2)*norm_x2_t(i,1) norm_x2_t(i,1) norm_x1_t(i,1)*norm_x2_t(i,2) norm_x1_t(i,2)*norm_x2_t(i,2) norm_x2_t(i,2) norm_x1_t(i,1) norm_x1_t(i,2) 1];
+    W(i,:) = [norm_x1_t(i,1)*norm_x2_t(i,1) norm_x1_t(i,2)*norm_x2_t(i,1) norm_x2_t(i,1) ...
+        norm_x1_t(i,1)*norm_x2_t(i,2) norm_x1_t(i,2)*norm_x2_t(i,2) norm_x2_t(i,2) ...
+        norm_x1_t(i,1) norm_x1_t(i,2) 1];
 end
 
-[U,D,V] = svd(W);
+W
+
+[U,D,V] = svd(W,0);
 
 % H = last column of V
 F_rank3 = reshape(V(:,9),3,3)';
@@ -23,7 +27,7 @@ D2(3,3) = 0;
 F = U2*D2*V2';
 
 % Denormalization
-F = T2\F*T1;
+F = T2'*F*T1;
 
 end
         
