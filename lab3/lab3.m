@@ -23,7 +23,6 @@ x2_test = P2 * X;
 F_es = fundamental_matrix(x1_test, x2_test);
 
 % Real fundamental matrix       % Zimmerman: Page 254
-cross(t,t)
 T=[0 -t(3) t(2) ; t(3) 0 -t(1) ; -t(2) t(1) 0 ];
 F_gt = T*R;  % ToDo: write the expression of the real fundamental matrix for P1 and P2
 
