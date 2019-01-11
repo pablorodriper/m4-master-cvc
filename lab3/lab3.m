@@ -20,10 +20,10 @@ x2_test = P2 * X;
 
 % Estimated fundamental matrix
 % ToDo: create the following function that estimates F using the normalised 8 point algorithm
-F_es = fundamental_matrix(x1_test, x2_test);
+F_es = fundamental_matrix(x1_test, x2_test)
 
 % Real fundamental matrix
-% F_gt = ... % ToDo: write the expression of the real fundamental matrix for P1 and P2
+% F_gt = ... % ToDo: write the expression of the real fundamental matrix for P1 and P
 
 % Evaluation: these two matrices should be very similar
 F_gt / norm(F_gt)
