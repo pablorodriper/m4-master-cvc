@@ -55,6 +55,7 @@ subplot(1,2,2); imshow(im2rgb); axis image; title('Image 2');
 [points_2, desc_2] = sift(im2, 'Threshold', 0.01);
 
 %% Match SIFT keypoints between a and b
+close all
 matches = siftmatch(desc_1, desc_2);
 figure;
 plotmatches(im1, im2, points_1(1:2,:), points_2(1:2,:), matches, 'Stacking', 'v');
@@ -64,7 +65,7 @@ p1 = [points_1(1:2, matches(1,:)); ones(1, length(matches))];
 p2 = [points_2(1:2, matches(2,:)); ones(1, length(matches))];
 
 % ToDo: create this function (you can use as a basis 'ransac_homography_adaptive_loop.m')
-[F, inliers] = ransac_fundamental_matrix(p1, p2, 2.0); 
+[F, inliers] = ransac_fundamental_matrix(p1, p2, 2.0, 1000); 
 
 % show inliers
 figure;
