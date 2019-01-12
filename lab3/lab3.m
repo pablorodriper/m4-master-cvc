@@ -1,6 +1,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Lab 3: The geometry of two views 
 % (application: photo-sequencing)
+%
+% Overleaf: https://www.overleaf.com/3753518638ggsrnmfxctzd
 
 addpath('sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
 
