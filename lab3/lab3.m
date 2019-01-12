@@ -201,9 +201,8 @@ point1_1 = [points_1(1:2,idx_car_I1)' 1]';
 point1_2 = [334 697 1]'; % (this is a given data)
 
 % l1 is the projection of the 3D trajectory of keypoint idx_car_I1
-% (it is the line that joins point1_1 and point1_2)
-
-% l1 = % ToDo: compute the line
+% line that joins point1_1 and point1_2
+l1 = cross(point1_1, point1_2); % ToDo: compute the line
 
 % plot the line
 figure;imshow(im1);
