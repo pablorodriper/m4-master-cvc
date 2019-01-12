@@ -187,10 +187,11 @@ p2 = [points_4(1:2, matches_4(2,:)); ones(1, length(matches_4))];
 
 % ToDo: complete the code
 
+% identify the corresponding point of idx_car_I1 in the other images
 idx_car_I1 = 1197;
-% idx_car_I2 = % ToDo: identify the corresponding point of idx_car_I1 in image 2
-% idx_car_I3 = % ToDo: identify the corresponding point of idx_car_I1 in image 3
-% idx_car_I4 = % ToDo: identify the corresponding point of idx_car_I1 in image 4
+idx_car_I2 = points_2(:, matches_2(1,:) == idx_car_I1);
+idx_car_I3 = points_3(:, matches_3(1,:) == idx_car_I1); 
+idx_car_I4 = points_4(:, matches_4(1,:) == idx_car_I1); 
 
 % coordinates (in image 1) of the keypoint idx_car_I1 (point in a van). 
 % point1_1 is the projection of a 3D point in the 3D trajectory of the van
