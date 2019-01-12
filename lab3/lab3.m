@@ -161,6 +161,12 @@ subplot(2,2,4); imshow(im4rgb); axis image; title('Image 4');
 % matrices needed for computing the trajectory of point idx_car_I1
 % (use the SIFT keypoints previously computed)
 
+% Compute sift matches
+matches_2 = siftmatch(desc_1, desc_2);
+matches_3 = siftmatch(desc_1, desc_3);
+matches_4 = siftmatch(desc_1, desc_4);
+
+
 
 %% Plot the car trajectory (keypoint idx_car_I1 in image 1)
 
@@ -180,7 +186,9 @@ point1_2 = [334 697 1]'; % (this is a given data)
 
 % l1 is the projection of the 3D trajectory of keypoint idx_car_I1
 % (it is the line that joins point1_1 and point1_2)
+
 % l1 = % ToDo: compute the line
+
 % plot the line
 figure;imshow(im1);
 hold on;
