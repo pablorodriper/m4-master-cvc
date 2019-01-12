@@ -50,7 +50,6 @@ figure;
 subplot(1,2,1); imshow(im1rgb); axis image; title('Image 1');
 subplot(1,2,2); imshow(im2rgb); axis image; title('Image 2');
 
-
 %% Compute SIFT keypoints
 
 % (make sure that the sift folder provided in lab2 is on the path)
@@ -61,8 +60,9 @@ subplot(1,2,2); imshow(im2rgb); axis image; title('Image 2');
 %% Match SIFT keypoints between a and b
 close all
 matches = siftmatch(desc_1, desc_2);
-figure;
+fig = figure;
 plotmatches(im1, im2, points_1(1:2,:), points_2(1:2,:), matches, 'Stacking', 'v');
+%saveas(fig,'castle_outliers.png')
 
 % p1 and p2 contain the homogeneous coordinates of the matches
 p1 = [points_1(1:2, matches(1,:)); ones(1, length(matches))];
@@ -72,9 +72,10 @@ p2 = [points_2(1:2, matches(2,:)); ones(1, length(matches))];
 [F, inliers] = ransac_fundamental_matrix(p1, p2, 2.0, 1000); 
 
 % show inliers
-figure;
+fig = figure;
 plotmatches(im1, im2, points_1(1:2,:), points_2(1:2,:), matches(:,inliers), 'Stacking', 'v');
 title('Inliers');
+%saveas(fig,'castle_inliers.png')
 
 vgg_gui_F(im1rgb, im2rgb, F');
 
@@ -90,7 +91,7 @@ m2 = inliers(20);
 m3 = inliers(30);
 
 % image 1 (plot the three points and their corresponding epipolar lines)
-figure;
+fig = figure;
 imshow(im1rgb);
 hold on;
 plot(p1(1, m1), p1(2, m1), '+g');
@@ -101,9 +102,10 @@ plot_homog_line(l1(:, m2));
 
 plot(p1(1, m3), p1(2, m3), '+g');
 plot_homog_line(l1(:, m3));
+%saveas(fig,'castle_epipolar_lines_1.png')
 
 % image 2 (plot the three points and their corresponding epipolar lines)
-figure;
+fig = figure;
 imshow(im2rgb);
 hold on;
 plot(p2(1, m1), p2(2, m1), '+g');
@@ -114,6 +116,7 @@ plot_homog_line(l2(:, m2));
 
 plot(p2(1, m3), p2(2, m3), '+g');
 plot_homog_line(l2(:, m3));
+%saveas(fig,'castle_epipolar_lines_2.png')
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -205,7 +208,7 @@ point1_2 = [334 697 1]'; % (this is a given data)
 l1 = cross(point1_1, point1_2); % ToDo: compute the line
 
 % plot the line
-figure;imshow(im1);
+fig = figure;imshow(im1);
 hold on;
 t=1:0.1:1000;
 plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
@@ -227,10 +230,10 @@ point3 = [points_3(1:2,idx_car_I3)' 1]';
 % ToDo: compute the epipolar line of point3 in the reference image
 l3 = F3'*point3;
 % plot the epipolar line
-plot(t, -(l3(1)*t + l3(3)) / l3(2), 'w');
+plot(t, -(l3(1)*t + l3(3)) / l3(2), 'r');
 % ToDo: compute the projection of point idx_car_I3 in the reference image
 pi3 = cross(l1,l3);
-plot(pi3(1)/pi3(3), pi3(2)/pi3(3), 'w*');
+plot(pi3(1)/pi3(3), pi3(2)/pi3(3), 'r*');
 
 % ToDo: write the homogeneous coordinates of the corresponding point of idx_car_I1 in image 4
 point4 = [points_4(1:2,idx_car_I4)' 1]';
@@ -242,6 +245,7 @@ plot(t, -(l4(1)*t + l4(3)) / l4(2), 'g');
 pi4 = cross(l1,l4);
 plot(pi4(1)/pi4(3), pi4(2)/pi4(3), 'g*');
 hold off
+%saveas(fig,'city_solution.png')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. OPTIONAL: Photo-sequencing with your own images
