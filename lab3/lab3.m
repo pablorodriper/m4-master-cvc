@@ -218,7 +218,7 @@ l2 = F2'*point2;
 % plot the epipolar line
 plot(t, -(l2(1)*t + l2(3)) / l2(2), 'c');
 % ToDo: compute the projection of point idx_car_I2 in the reference image 
-% pi2 = %
+pi2 = cross(l1,l2);
 % plot this point
 plot(pi2(1)/pi2(3), pi2(2)/pi2(3), 'c*');
 
@@ -227,10 +227,10 @@ point3 = [points_3(1:2,idx_car_I3)' 1]';
 % ToDo: compute the epipolar line of point3 in the reference image
 l3 = F3'*point3;
 % plot the epipolar line
-plot(t, -(l3(1)*t + l3(3)) / l3(2), 'b');
+plot(t, -(l3(1)*t + l3(3)) / l3(2), 'w');
 % ToDo: compute the projection of point idx_car_I3 in the reference image
-% pi3 = %
-plot(pi3(1)/pi3(3), pi3(2)/pi3(3), 'b*');
+pi3 = cross(l1,l3);
+plot(pi3(1)/pi3(3), pi3(2)/pi3(3), 'w*');
 
 % ToDo: write the homogeneous coordinates of the corresponding point of idx_car_I1 in image 4
 point4 = [points_4(1:2,idx_car_I4)' 1]';
@@ -239,7 +239,7 @@ l4 = F4'*point4;
 % plot the epipolar line
 plot(t, -(l4(1)*t + l4(3)) / l4(2), 'g');
 % ToDo: compute the projection of point idx_car_I4 in the reference image
-% pi4 = %
+pi4 = cross(l1,l4);
 plot(pi4(1)/pi4(3), pi4(2)/pi4(3), 'g*');
 
 
