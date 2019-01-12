@@ -241,7 +241,7 @@ plot(t, -(l4(1)*t + l4(3)) / l4(2), 'g');
 % ToDo: compute the projection of point idx_car_I4 in the reference image
 pi4 = cross(l1,l4);
 plot(pi4(1)/pi4(3), pi4(2)/pi4(3), 'g*');
-
+hold off
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. OPTIONAL: Photo-sequencing with your own images
