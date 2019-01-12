@@ -150,10 +150,11 @@ subplot(2,2,3); imshow(im3rgb); axis image; title('Image 3');
 subplot(2,2,4); imshow(im4rgb); axis image; title('Image 4');
 
 % Compute SIFT keypoints
-[points_1, desc_1] = sift(im1, 'Threshold', 0.015); % Do not change this threshold!
-[points_2, desc_2] = sift(im2, 'Threshold', 0.015);
-[points_3, desc_3] = sift(im3, 'Threshold', 0.015);
-[points_4, desc_4] = sift(im4, 'Threshold', 0.015);
+THRESHOLD = 0.015;          % Do not change this threshold!
+[points_1, desc_1] = sift(im1, 'Threshold', THRESHOLD); 
+[points_2, desc_2] = sift(im2, 'Threshold', THRESHOLD);
+[points_3, desc_3] = sift(im3, 'Threshold', THRESHOLD);
+[points_4, desc_4] = sift(im4, 'Threshold', THRESHOLD);
 
 %% Take image im1 as reference image (image 1) and compute the fundamental 
 % matrices needed for computing the trajectory of point idx_car_I1
@@ -168,16 +169,19 @@ matches_4 = siftmatch(desc_1, desc_4);
 p1 = [points_1(1:2, matches_2(1,:)); ones(1, length(matches_2))];
 p2 = [points_2(1:2, matches_2(2,:)); ones(1, length(matches_2))];
 [F2, inliers_2] = ransac_fundamental_matrix(p1, p2, 2.0, 1000);
+'F for images 1 and 2 calculated'
 
 % F matrix of image 3
 p1 = [points_1(1:2, matches_3(1,:)); ones(1, length(matches_3))];
-p2 = [points_2(1:2, matches_3(2,:)); ones(1, length(matches_3))];
-[F3, inliers_3] = ransac_fundamental_matrix(p1, p2, 2.0, 1000); 
+p2 = [points_3(1:2, matches_3(2,:)); ones(1, length(matches_3))];
+[F3, inliers_3] = ransac_fundamental_matrix(p1, p2, 2.0, 1000);
+'F for images 1 and 3 calculated'
 
 % F matrix of image 4
 p1 = [points_1(1:2, matches_4(1,:)); ones(1, length(matches_4))];
-p2 = [points_2(1:2, matches_4(2,:)); ones(1, length(matches_4))];
-[F4, inliers_4] = ransac_fundamental_matrix(p1, p2, 2.0, 1000); 
+p2 = [points_4(1:2, matches_4(2,:)); ones(1, length(matches_4))];
+[F4, inliers_4] = ransac_fundamental_matrix(p1, p2, 2.0, 1000);
+'F for images 1 and 4 calculated'
 
 %% Plot the car trajectory (keypoint idx_car_I1 in image 1)
 
