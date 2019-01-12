@@ -189,9 +189,9 @@ p2 = [points_4(1:2, matches_4(2,:)); ones(1, length(matches_4))];
 
 % identify the corresponding point of idx_car_I1 in the other images
 idx_car_I1 = 1197;
-idx_car_I2 = points_2(:, matches_2(1,:) == idx_car_I1);
-idx_car_I3 = points_3(:, matches_3(1,:) == idx_car_I1); 
-idx_car_I4 = points_4(:, matches_4(1,:) == idx_car_I1); 
+idx_car_I2 = matches_2(2, (find(matches_2(1,:) == idx_car_I1)));
+idx_car_I3 = matches_3(2, (find(matches_3(1,:) == idx_car_I1)));
+idx_car_I4 = matches_4(2, (find(matches_4(1,:) == idx_car_I1)));
 
 % coordinates (in image 1) of the keypoint idx_car_I1 (point in a van). 
 % point1_1 is the projection of a 3D point in the 3D trajectory of the van
@@ -212,9 +212,9 @@ plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
 plot(points_1(1,1197), points_1(2,1197), 'y*');
 
 % ToDo: write the homogeneous coordinates of the corresponding point of idx_car_I1 in image 2
-% point2 = %
+point2 = [points_2(1:2,idx_car_I2)' 1]';
 % ToDo: compute the epipolar line of point2 in the reference image
-% l2 = %
+% l2 = % 
 % plot the epipolar line
 plot(t, -(l2(1)*t + l2(3)) / l2(2), 'c');
 % ToDo: compute the projection of point idx_car_I2 in the reference image 
@@ -223,7 +223,7 @@ plot(t, -(l2(1)*t + l2(3)) / l2(2), 'c');
 plot(pi2(1)/pi2(3), pi2(2)/pi2(3), 'c*');
 
 % ToDo: write the homogeneous coordinates of the corresponding point of idx_car_I1 in image 3
-% point3 = %
+point3 = [points_3(1:2,idx_car_I3)' 1]';
 % ToDo: compute the epipolar line of point3 in the reference image
 % l3 = %
 % plot the epipolar line
@@ -233,7 +233,7 @@ plot(t, -(l3(1)*t + l3(3)) / l3(2), 'b');
 plot(pi3(1)/pi3(3), pi3(2)/pi3(3), 'b*');
 
 % ToDo: write the homogeneous coordinates of the corresponding point of idx_car_I1 in image 4
-% point4 = %
+point4 = [points_4(1:2,idx_car_I4)' 1]';
 % ToDo: compute the epipolar line of point4 in the reference image
 % l4 = %
 % plot the epipolar line
