@@ -13,8 +13,8 @@ while it < max_it
     inliers = compute_inliers(F, p1, p2, th);
     
     % test if it is the best model so far
-    length(best_inliers)
     if length(inliers) > length(best_inliers)
+        %length(best_inliers)
         best_inliers = inliers;
     end    
     
@@ -35,24 +35,16 @@ idx_inliers = best_inliers;
 
 
 function idx_inliers = compute_inliers(F, p1, p2, th)
-    % Check that F is invertible
-%     if abs(log(cond(F))) > 15
-%         idx_inliers = [];
-%         return
-%     end
-    
-    % transformed points (in both directions)
-    num = (p2'*F*p1);
+
+    num = zeros(1,length(p1));
+	for n = 1:length(p1)
+	    num(n) = p2(:,n)'*F*p1(:,n);
+	end
     den_1 = F*p1;
-    den_2 = F*p2;
-    
-    % normalise homogeneous coordinates (third coordinate to 1)
-    num = normalise(num);
-    den_1 = normalise(den_1);
-    den_2 = normalise(den_2);
+    den_2 = F'*p2;
     
     % compute the symmetric geometric error
-    d2 = sum((num.^2)./(den_1(1,:).^2+den_1(2,:).^2+den_2(1,:).^2+den_2(2,:).^2));
+    d2 = ((num.^2)./(den_1(1,:).^2+den_1(2,:).^2+den_2(1,:).^2+den_2(2,:).^2));
     idx_inliers = find(d2 < th.^2);
 
 

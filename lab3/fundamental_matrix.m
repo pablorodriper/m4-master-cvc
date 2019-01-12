@@ -1,6 +1,6 @@
 function F = fundamental_matrix(x1_test, x2_test)
 
-W = zeros(length(x1_test),length(x1_test)+1);
+W = zeros(length(x1_test),9);
 [norm_x1, T1] = normalise2dpts(x1_test);
 [norm_x2, T2] = normalise2dpts(x2_test);
 

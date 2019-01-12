@@ -27,9 +27,12 @@ T=[0 -t(3) t(2) ; t(3) 0 -t(1) ; -t(2) t(1) 0 ];
 F_gt = T*R;  % ToDo: write the expression of the real fundamental matrix for P1 and P2
 
 % Evaluation: these two matrices should be very similar
-F_gt / norm(F_gt)
-F_es / norm(F_es)
+F_gt = F_gt / norm(F_gt)
+F_es = F_es / norm(F_es)
 
+if sum(sum(abs(F_gt-F_es))) < 0.011
+    'F_gt and F_es are similar'
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Robustly fit fundamental matrix
@@ -76,8 +79,8 @@ vgg_gui_F(im1rgb, im2rgb, F');
 
 %% Plot some epipolar lines
 
-% l2 = ... % epipolar lines in image 2 % ToDo
-% l1 = ... % epipolar lines in image 1 % ToDo
+l2 = F*p1; % epipolar lines in image 2 % ToDo
+l1 = F'*p2; % epipolar lines in image 1 % ToDo
 
 % choose three random indices
 m1 = inliers(10);
