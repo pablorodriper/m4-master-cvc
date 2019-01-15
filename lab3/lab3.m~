@@ -337,15 +337,15 @@ p1 = [points_1(1:2, matches_5(1,:)); ones(1, length(matches_5))];
 p2 = [points_5(1:2, matches_5(2,:)); ones(1, length(matches_5))];
 [F5, inliers_5] = ransac_fundamental_matrix(p1, p2, 2.0, 1000);
 
-% F matrix of image 3
-p1 = [points_1(1:2, matches_6(1,:)); ones(1, length(matches_6))];
-p2 = [points_6(1:2, matches_6(2,:)); ones(1, length(matches_6))];
-[F6, inliers_6] = ransac_fundamental_matrix(p1, p2, 2.0, 1000);
-
-% F matrix of image 4
-p1 = [points_1(1:2, matches_7(1,:)); ones(1, length(matches_7))];
-p2 = [points_7(1:2, matches_7(2,:)); ones(1, length(matches_7))];
-[F7, inliers_7] = ransac_fundamental_matrix(p1, p2, 2.0, 1000);
+% % F matrix of image 3
+% p1 = [points_1(1:2, matches_6(1,:)); ones(1, length(matches_6))];
+% p2 = [points_6(1:2, matches_6(2,:)); ones(1, length(matches_6))];
+% [F6, inliers_6] = ransac_fundamental_matrix(p1, p2, 2.0, 1000);
+% 
+% % F matrix of image 4
+% p1 = [points_1(1:2, matches_7(1,:)); ones(1, length(matches_7))];
+% p2 = [points_7(1:2, matches_7(2,:)); ones(1, length(matches_7))];
+% [F7, inliers_7] = ransac_fundamental_matrix(p1, p2, 2.0, 1000);
 
 
 
@@ -362,18 +362,16 @@ for dyn = find(dyn_points == 1)
     idx_car_I6 = matches_6(2, (find(matches_6(1,:) == idx_car_I1)));
     idx_car_I7 = matches_7(2, (find(matches_7(1,:) == idx_car_I1)));
     
-    %if (isempty(idx_car_I3) || isempty(idx_car_I4) || isempty(idx_car_I5) || isempty(idx_car_I6) || isempty(idx_car_I7))
-     if sum([isempty(idx_car_I3), isempty(idx_car_I4), isempty(idx_car_I5), isempty(idx_car_I6), isempty(idx_car_I7)]) > 2
-        'Not found'
+    if (isempty(idx_car_I3) || isempty(idx_car_I4) || isempty(idx_car_I5) || isempty(idx_car_I6) || isempty(idx_car_I7))
         continue
     else
-        'Correct'
+        'Not found'
     end
 
     point1_1 = [points_1(1:2,idx_car_I1)' 1]';
     % coordinates (in image 1) of another 3D point in the same 3D trajectory of
     % the van
-    point1_2 = [points_2(1:2, matches_2(2, dyn)); 1]; % (this is a given data) TODO
+    point1_2 = [points_2(1:2, dyn); 1]; % (this is a given data) TODO
 
     % l1 is the projection of the 3D trajectory of keypoint idx_car_I1
     % line that joins point1_1 and point1_2
