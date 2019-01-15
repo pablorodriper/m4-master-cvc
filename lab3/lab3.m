@@ -318,33 +318,38 @@ hold off
 
 
 % F matrix of image 2
-p1 = [points_1(1:2, matches_2(1,:)); ones(1, length(matches_2))];
-p2 = [points_2(1:2, matches_2(2,:)); ones(1, length(matches_2))];
+p1 = [points_1(1:2, matches_2(1,find(dyn_points == 0))); ones(1, length(matches_2(1,find(dyn_points == 0))))];
+p2 = [points_2(1:2, matches_2(2,find(dyn_points == 0))); ones(1, length(matches_2(1,find(dyn_points == 0))))];
 [F2, inliers_2] = ransac_fundamental_matrix(p1, p2, 2.0, 1000);
 
 % F matrix of image 3
-p1 = [points_1(1:2, matches_3(1,:)); ones(1, length(matches_3))];
-p2 = [points_3(1:2, matches_3(2,:)); ones(1, length(matches_3))];
+static3 = ismember(matches_3(1,:), matches_2(1, find(dyn_points == 0)));
+p1 = [points_1(1:2, matches_3(1, static3)); ones(1, sum(static3))];
+p2 = [points_3(1:2, matches_3(2,static3)); ones(1, sum(static3))];
 [F3, inliers_3] = ransac_fundamental_matrix(p1, p2, 2.0, 1000);
 
 % F matrix of image 4
-p1 = [points_1(1:2, matches_4(1,:)); ones(1, length(matches_4))];
-p2 = [points_4(1:2, matches_4(2,:)); ones(1, length(matches_4))];
+static4 = ismember(matches_4(1,:), matches_2(1, find(dyn_points == 0)));
+p1 = [points_1(1:2, matches_4(1, static4)); ones(1, sum(static4))];
+p2 = [points_4(1:2, matches_4(2,static4)); ones(1, sum(static4))];
 [F4, inliers_4] = ransac_fundamental_matrix(p1, p2, 2.0, 1000);
 
-% F matrix of image 2
-p1 = [points_1(1:2, matches_5(1,:)); ones(1, length(matches_5))];
-p2 = [points_5(1:2, matches_5(2,:)); ones(1, length(matches_5))];
+% F matrix of image 5
+static5 = ismember(matches_5(1,:), matches_2(1, find(dyn_points == 0)));
+p1 = [points_1(1:2, matches_5(1, static5)); ones(1, sum(static5))];
+p2 = [points_5(1:2, matches_5(2,static5)); ones(1, sum(static5))];
 [F5, inliers_5] = ransac_fundamental_matrix(p1, p2, 2.0, 1000);
 
-% F matrix of image 3
-p1 = [points_1(1:2, matches_6(1,:)); ones(1, length(matches_6))];
-p2 = [points_6(1:2, matches_6(2,:)); ones(1, length(matches_6))];
+% F matrix of image 6
+static6 = ismember(matches_6(1,:), matches_2(1, find(dyn_points == 0)));
+p1 = [points_1(1:2, matches_6(1, static6)); ones(1, sum(static6))];
+p2 = [points_6(1:2, matches_6(2,static6)); ones(1, sum(static6))];
 [F6, inliers_6] = ransac_fundamental_matrix(p1, p2, 2.0, 1000);
 
-% F matrix of image 4
-p1 = [points_1(1:2, matches_7(1,:)); ones(1, length(matches_7))];
-p2 = [points_7(1:2, matches_7(2,:)); ones(1, length(matches_7))];
+% F matrix of image 7
+static7 = ismember(matches_7(1,:), matches_2(1, find(dyn_points == 0)));
+p1 = [points_1(1:2, matches_7(1, static7)); ones(1, sum(static7))];
+p2 = [points_7(1:2, matches_7(2,static7)); ones(1, sum(static7))];
 [F7, inliers_7] = ransac_fundamental_matrix(p1, p2, 2.0, 1000);
 
 
