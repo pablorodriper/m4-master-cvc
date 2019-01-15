@@ -1,10 +1,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Lab 3: The geometry of two views 
 % (application: photo-sequencing)
-%
-% Overleaf: https://www.overleaf.com/3753518638ggsrnmfxctzd
 
-addpath('../lab2/sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
+addpath('sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
+%iptsetpref('ImshowBorder','tight');
+%ax = gca; outerpos = ax.OuterPosition; ti = ax.TightInset;  left = outerpos(1) + ti(1); bottom = outerpos(2) + ti(2); ax_width = outerpos(3) - ti(1) - ti(3); ax_height = outerpos(4) - ti(2) - ti(4); ax.Position = [left bottom ax_width ax_height];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Compute the fundamental matrix
@@ -32,7 +32,7 @@ F_gt = T*R;  % ToDo: write the expression of the real fundamental matrix for P1 
 F_gt = F_gt / norm(F_gt)
 F_es = F_es / norm(F_es)
 
-if sum(sum(abs(F_gt-F_es))) < 0.011
+if sum(sum(abs(F_gt-F_es))) < 0.011 || sum(sum(abs(F_gt-(-1*F_es)))) < 0.011
     'F_gt and F_es are similar'
 end
 
@@ -250,6 +250,10 @@ hold off
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. OPTIONAL: Photo-sequencing with your own images
 
+% 4.1 Take a set of images of a moving scene from different viewpoints at 
+%     different time instants. At least two images have to be taken from
+%     roughly the same location by the same camera.
+
 % Read images
 im1rgb = imread('Montserrat/IMG_2222_scaled.jpg');
 im2rgb = imread('Montserrat/IMG_2223_scaled.jpg');
@@ -259,14 +263,6 @@ im5rgb = imread('Montserrat/IMG_2227_scaled.jpg');
 im6rgb = imread('Montserrat/IMG_2228_scaled.jpg');
 im7rgb = imread('Montserrat/IMG_2229_scaled.jpg');
 
-% im1rgb = imrotate(im1rgb,180);
-% im2rgb = imrotate(im2rgb,180);
-% im3rgb = imrotate(im3rgb,180);
-% im4rgb = imrotate(im4rgb,180);
-% im5rgb = imrotate(im5rgb,180);
-% im6rgb = imrotate(im6rgb,180);
-% im7rgb = imrotate(im7rgb,180);
-
 im1 = sum(double(im1rgb), 3) / 3 / 255;
 im2 = sum(double(im2rgb), 3) / 3 / 255;
 im3 = sum(double(im3rgb), 3) / 3 / 255;
@@ -275,22 +271,26 @@ im5 = sum(double(im5rgb), 3) / 3 / 255;
 im6 = sum(double(im6rgb), 3) / 3 / 255;
 im7 = sum(double(im7rgb), 3) / 3 / 255;
 
+% 4.2 Implement the first part (until line 16) of the Algorithm 1 of the 
+%     Photo-sequencing paper with a selection of the detected dynamic
+%     features. You may reuse the code generated for the previous question.
+
 % Compute SIFT keypoints
-THRESHOLD = 0.015;          % Do not change this threshold!
+THRESHOLD = 0.015;          
 [points_1, desc_1] = sift(im1, 'Threshold', THRESHOLD); 
-points_1 = floor(points_1+0.5);
+points_1 = round(points_1);
 [points_2, desc_2] = sift(im2, 'Threshold', THRESHOLD);
-points_2 = floor(points_2+0.5);
+points_2 = round(points_2);
 [points_3, desc_3] = sift(im3, 'Threshold', THRESHOLD);
-points_3 = floor(points_3+0.5);
+points_3 = round(points_3);
 [points_4, desc_4] = sift(im4, 'Threshold', THRESHOLD);
-points_4 = floor(points_4+0.5);
+points_4 = round(points_4);
 [points_5, desc_5] = sift(im5, 'Threshold', THRESHOLD); 
-points_5 = floor(points_5+0.5);
+points_5 = round(points_5);
 [points_6, desc_6] = sift(im6, 'Threshold', THRESHOLD);
-points_6 = floor(points_6+0.5);
+points_6 = round(points_6);
 [points_7, desc_7] = sift(im7, 'Threshold', THRESHOLD);
-points_7 = floor(points_7+0.5);
+points_7 = round(points_7);
 
 matches_2 = siftmatch(desc_1, desc_2);
 matches_3 = siftmatch(desc_1, desc_3);
@@ -347,10 +347,7 @@ p1 = [points_1(1:2, matches_7(1,:)); ones(1, length(matches_7))];
 p2 = [points_7(1:2, matches_7(2,:)); ones(1, length(matches_7))];
 [F7, inliers_7] = ransac_fundamental_matrix(p1, p2, 2.0, 1000);
 
-
-
-%% 4.1: compute trajectory
-
+% Compute trajectory
 for dyn = find(dyn_points == 1)
 
     % identify the corresponding point of idx_car_I1 in the other images
@@ -440,7 +437,7 @@ for dyn = find(dyn_points == 1)
 
 end
 
-
+%saveas(fig,'cablecar_solution.png')
 
 
 
@@ -453,12 +450,3 @@ end
 % imshow(im1);
 % hold on;
 % plot(864,896,'r*', 'LineWidth', 2, 'MarkerSize', 10);
-
-% 4.1 Take a set of images of a moving scene from different viewpoints at 
-%     different time instants. At least two images have to be taken from
-%     roughly the same location by the same camera.
-%
-% 4.2 Implement the first part (until line 16) of the Algorithm 1 of the 
-%     Photo-sequencing paper with a selection of the detected dynamic
-%     features. You may reuse the code generated for the previous question.
-%
