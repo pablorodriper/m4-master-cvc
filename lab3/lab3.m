@@ -3,8 +3,6 @@
 % (application: photo-sequencing)
 
 addpath('sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
-%iptsetpref('ImshowBorder','tight');
-%ax = gca; outerpos = ax.OuterPosition; ti = ax.TightInset;  left = outerpos(1) + ti(1); bottom = outerpos(2) + ti(2); ax_width = outerpos(3) - ti(1) - ti(3); ax_height = outerpos(4) - ti(2) - ti(4); ax.Position = [left bottom ax_width ax_height];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Compute the fundamental matrix
@@ -132,7 +130,7 @@ plot_homog_line(l2(:, m3));
 % of three points on this 3D trajectory at three different time instants 
 % (corresponding to the time when the three other provided images where taken). 
 
-clear all;
+% clear all;
 
 % Read images
 im1rgb = imread('Data/frame_00000.tif');
@@ -299,24 +297,29 @@ matches_5 = siftmatch(desc_1, desc_5);
 matches_6 = siftmatch(desc_1, desc_6);
 matches_7 = siftmatch(desc_1, desc_7);
 
-
-%Selecting dynamic and static keypoints of the first image by comparing
+%% Selecting dynamic and static keypoints of the first image by comparing
 % the first two images
 p_im1 = points_1(1:2, matches_2(1,:));
 p_im2 = points_2(1:2, matches_2(2,:));
 
 dist = CalcDistance(p_im1(1,:), p_im1(2,:), p_im2(1,:), p_im2(2,:));
 
-dyn_points = dist > 140 & dist < 150;
+% Find threshold
+dist_copy = dist(dist > 20);    % We drop out the smallest values
+% Find maximum value
+beans_division = 10;
+[M, index] = max(hist(dist_copy, 1:beans_division:max(dist)))
+fig = figure; histogram(dist_copy, 1:beans_division:max(dist)); 
+title('Histogram of distances'); xlabel('Distance value'); ylabel('Number of keypoints');
+dyn_points = dist > (index*beans_division-beans_division) & dist < index*beans_division;
 
-
-%plotmatches(im1, im2, points_1(1:2,:), points_2(1:2,:), matches_2(find(dyn_points == 1)), 'Stacking', 'v');
-imshow(im1)
+% Plot dynamic keypoints
+fig = figure;imshow(im1);
 hold on
-plot(p_im1(1, find(dyn_points == 1)), p_im1(2, find(dyn_points == 1)), '+b')
+plot(p_im1(1, find(dyn_points == 1)), p_im1(2, find(dyn_points == 1)), '+c', 'MarkerSize',15,'LineWidth',1)
 hold off
 
-
+%% Calculate F matrix
 % F matrix of image 2
 p1 = [points_1(1:2, matches_2(1,find(dyn_points == 0))); ones(1, length(matches_2(1,find(dyn_points == 0))))];
 p2 = [points_2(1:2, matches_2(2,find(dyn_points == 0))); ones(1, length(matches_2(1,find(dyn_points == 0))))];
@@ -353,52 +356,64 @@ p2 = [points_7(1:2, matches_7(2,static7)); ones(1, sum(static7))];
 [F7, inliers_7] = ransac_fundamental_matrix(p1, p2, 2.0, 1000);
 
 % Compute trajectory
+max_empty_matches = 999;
+index = -1;
 for dyn = find(dyn_points == 1)
 
     % identify the corresponding point of idx_car_I1 in the other images
     idx_car_I1 = matches_2(1, dyn);
-    idx_car_I2 = matches_2(2, (find(matches_2(1,:) == idx_car_I1)));
+    %idx_car_I2 = matches_2(2, (find(matches_2(1,:) == idx_car_I1)));
     idx_car_I3 = matches_3(2, (find(matches_3(1,:) == idx_car_I1)));
     idx_car_I4 = matches_4(2, (find(matches_4(1,:) == idx_car_I1)));
     idx_car_I5 = matches_5(2, (find(matches_5(1,:) == idx_car_I1)));
     idx_car_I6 = matches_6(2, (find(matches_6(1,:) == idx_car_I1)));
     idx_car_I7 = matches_7(2, (find(matches_7(1,:) == idx_car_I1)));
     
-    %if (isempty(idx_car_I3) || isempty(idx_car_I4) || isempty(idx_car_I5) || isempty(idx_car_I6) || isempty(idx_car_I7))
-     if sum([isempty(idx_car_I3), isempty(idx_car_I4), isempty(idx_car_I5), isempty(idx_car_I6), isempty(idx_car_I7)]) > 2
-        'Not found'
-        continue
-    else
-        'Correct'
+    % calculate matches
+    total_empty_matches = sum([isempty(idx_car_I3), isempty(idx_car_I4), isempty(idx_car_I5), isempty(idx_car_I6), isempty(idx_car_I7)]);
+    if(total_empty_matches < max_empty_matches)
+        max_empty_matches = total_empty_matches;
+        index = dyn;
     end
+end
 
-    point1_1 = [points_1(1:2,idx_car_I1)' 1]';
-    % coordinates (in image 1) of another 3D point in the same 3D trajectory of
-    % the van
-    point1_2 = [points_2(1:2, matches_2(2, dyn)); 1]; % (this is a given data) TODO
+dyn = index;
 
-    % l1 is the projection of the 3D trajectory of keypoint idx_car_I1
-    % line that joins point1_1 and point1_2
-    l1 = cross(point1_1, point1_2); % ToDo: compute the line
+% identify the corresponding point of idx_car_I1 in the other images
+idx_car_I1 = matches_2(1, dyn);
+idx_car_I2 = matches_2(2, (find(matches_2(1,:) == idx_car_I1)));
+idx_car_I3 = matches_3(2, (find(matches_3(1,:) == idx_car_I1)));
+idx_car_I4 = matches_4(2, (find(matches_4(1,:) == idx_car_I1)));
+idx_car_I5 = matches_5(2, (find(matches_5(1,:) == idx_car_I1)));
+idx_car_I6 = matches_6(2, (find(matches_6(1,:) == idx_car_I1)));
+idx_car_I7 = matches_7(2, (find(matches_7(1,:) == idx_car_I1)));
+    
+% Points for the trajectory line
+point1_1 = [points_1(1:2,idx_car_I1)' 1]';
+point1_2 = [points_2(1:2, matches_2(2, dyn)); 1];
+% l1 is the projection of the 3D trajectory of keypoint idx_car_I1
+% line that joins point1_1 and point1_2
+l1 = cross(point1_1, point1_2); % ToDo: compute the line
 
-    % plot the line
-    fig = figure;imshow(im1);
-    hold on;
-    t=1:0.1:1000;
-    plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
-    plot(points_1(1,idx_car_I1), points_1(2,idx_car_I1), 'y*');
+% plot the line
+fig = figure;imshow(im1);
+hold on;
+t=1:0.1:1000;
+plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
+plot(points_1(1,idx_car_I1), points_1(2,idx_car_I1), 'y*');
 
-    % ToDo: write the homogeneous coordinates of the corresponding point of idx_car_I1 in image 2
-    point2 = [points_2(1:2,idx_car_I2)' 1]';
-    % ToDo: compute the epipolar line of point2 in the reference image
-    l2 = F2'*point2;
-    % plot the epipolar line
-    plot(t, -(l2(1)*t + l2(3)) / l2(2), 'c');
-    % ToDo: compute the projection of point idx_car_I2 in the reference image 
-    pi2 = cross(l1,l2);
-    % plot this point
-    plot(pi2(1)/pi2(3), pi2(2)/pi2(3), 'c*');
+% ToDo: write the homogeneous coordinates of the corresponding point of idx_car_I1 in image 2
+point2 = [points_2(1:2,idx_car_I2)' 1]';
+% ToDo: compute the epipolar line of point2 in the reference image
+l2 = F2'*point2;
+% plot the epipolar line
+plot(t, -(l2(1)*t + l2(3)) / l2(2), 'c');
+% ToDo: compute the projection of point idx_car_I2 in the reference image 
+pi2 = cross(l1,l2);
+% plot this point
+plot(pi2(1)/pi2(3), pi2(2)/pi2(3), 'c*');
 
+if not(isempty(idx_car_I3))
     % ToDo: write the homogeneous coordinates of the corresponding point of idx_car_I1 in image 3
     point3 = [points_3(1:2,idx_car_I3)' 1]';
     % ToDo: compute the epipolar line of point3 in the reference image
@@ -408,50 +423,54 @@ for dyn = find(dyn_points == 1)
     % ToDo: compute the projection of point idx_car_I3 in the reference image
     pi3 = cross(l1,l3);
     plot(pi3(1)/pi3(3), pi3(2)/pi3(3), 'r*');
+end
 
-    % % ToDo: write the homogeneous coordinates of the corresponding point of idx_car_I1 in image 4
-    % point4 = [points_4(1:2,idx_car_I4)' 1]';
-    % % ToDo: compute the epipolar line of point4 in the reference image
-    % l4 = F4'*point4;
-    % % plot the epipolar line
-    % plot(t, -(l4(1)*t + l4(3)) / l4(2), 'g');
-    % % ToDo: compute the projection of point idx_car_I4 in the reference image
-    % pi4 = cross(l1,l4);
-    % plot(pi4(1)/pi4(3), pi4(2)/pi4(3), 'g*');
-
+if not(isempty(idx_car_I4))
     % ToDo: write the homogeneous coordinates of the corresponding point of idx_car_I1 in image 4
-    point5 = [points_5(1:2,idx_car_I5)' 1]';
+    point4 = [points_4(1:2,idx_car_I4)' 1]';
     % ToDo: compute the epipolar line of point4 in the reference image
+    l4 = F4'*point4;
+    % plot the epipolar line
+    plot(t, -(l4(1)*t + l4(3)) / l4(2), 'b');
+    % ToDo: compute the projection of point idx_car_I4 in the reference image
+    pi4 = cross(l1,l4);
+    plot(pi4(1)/pi4(3), pi4(2)/pi4(3), 'b*');
+end
+
+if not(isempty(idx_car_I5))
+    % ToDo: write the homogeneous coordinates of the corresponding point of idx_car_I1 in image 5
+    point5 = [points_5(1:2,idx_car_I5)' 1]';
+    % ToDo: compute the epipolar line of point5 in the reference image
     l5 = F5'*point5;
     % plot the epipolar line
     plot(t, -(l5(1)*t + l5(3)) / l5(2), 'g');
-    % ToDo: compute the projection of point idx_car_I4 in the reference image
+    % ToDo: compute the projection of point idx_car_I5 in the reference image
     pi5 = cross(l1,l5);
     plot(pi5(1)/pi5(3), pi5(2)/pi5(3), 'g*');
+end
 
-    % ToDo: write the homogeneous coordinates of the corresponding point of idx_car_I1 in image 4
+if not(isempty(idx_car_I6))
+    % ToDo: write the homogeneous coordinates of the corresponding point of idx_car_I1 in image 6
     point6 = [points_6(1:2,idx_car_I6)' 1]';
-    % ToDo: compute the epipolar line of point4 in the reference image
+    % ToDo: compute the epipolar line of point6 in the reference image
     l6 = F6'*point6;
     % plot the epipolar line
     plot(t, -(l6(1)*t + l6(3)) / l6(2), 'w');
-    % ToDo: compute the projection of point idx_car_I4 in the reference image
+    % ToDo: compute the projection of point idx_car_I6 in the reference image
     pi6 = cross(l1,l6);
     plot(pi6(1)/pi6(3), pi6(2)/pi6(3), 'w*');
+end
 
-
+if not(isempty(idx_car_I7))
+    % ToDo: write the homogeneous coordinates of the corresponding point of idx_car_I1 in image 7
+    point7 = [points_7(1:2,idx_car_I7)' 1]';
+    % ToDo: compute the epipolar line of point7 in the reference image
+    l7 = F7'*point7;
+    % plot the epipolar line
+    plot(t, -(l7(1)*t + l7(3)) / l7(2), 'v');
+    % ToDo: compute the projection of point idx_car_I7 in the reference image
+    pi7 = cross(l1,l7);
+    plot(pi7(1)/pi7(3), pi7(2)/pi7(3), 'v*');
 end
 
 %saveas(fig,'cablecar_solution.png')
-
-
-
-% [864,896] position of cable car in image 1
-% [217,228] position of cable car in image 1
-% [213.8,217.4] keypoint cable car in image 1 4322
-% new [184,213]
-% new [189,216]
-
-% imshow(im1);
-% hold on;
-% plot(864,896,'r*', 'LineWidth', 2, 'MarkerSize', 10);
