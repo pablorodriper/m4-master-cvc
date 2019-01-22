@@ -366,9 +366,9 @@ disparity_gt = imread('Data/truedisp.row3.col3.pgm');
 
 min_disp = 0;
 max_disp = 16;
-w_size = 29;
+w_size = 70;
 
-disparity_map = stereo_computation_asdf(I_left, I_right, ...
+disparity_map = stereo_computation_ASW(I_left, I_right, ...
     min_disp, max_disp, w_size, 'ASW');
 
 fig = figure;
