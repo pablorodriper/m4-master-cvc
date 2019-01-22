@@ -61,8 +61,9 @@ end
 matches = siftmatch(descr{1}, descr{2});
 
 % Plot matches.
-figure();
+fig = figure();
 plotmatches(I{1}, I{2}, points{1}, points{2}, matches, 'Stacking', 'v');
+saveas(fig,'results/1_facace_with_outliers', 'epsc');
 
 
 %% Fit Fundamental matrix and remove outliers.
@@ -72,8 +73,9 @@ x2 = points{2}(:, matches(2, :));
 
 % Plot inliers.
 inlier_matches = matches(:, inliers);
-figure;
+fig = figure;
 plotmatches(I{1}, I{2}, points{1}, points{2}, inlier_matches, 'Stacking', 'v');
+saveas(fig,'results/2_facace_without_outliers', 'epsc')
 
 x1 = points{1}(:, inlier_matches(1, :));
 x2 = points{2}(:, inlier_matches(2, :));
@@ -131,19 +133,19 @@ Pc2{4} = K*[R_1 -t];
 fig = figure;
 plot_camera(P1,w,h,'b');
 plot_camera(Pc2{1},w,h,'g');
-%saveas(fig,strcat('results/camera_sol_1.png'))
+saveas(fig,'results/3_camera_sol_1', 'epsc')
 fig = figure;
 plot_camera(P1,w,h,'b');
 plot_camera(Pc2{2},w,h,'g');
-%saveas(fig,strcat('results/camera_sol_2.png'))
+saveas(fig,'results/4_camera_sol_2', 'epsc')
 fig = figure;
 plot_camera(P1,w,h,'b');
 plot_camera(Pc2{3},w,h,'g');
-%saveas(fig,strcat('results/camera_sol_3.png'))
+saveas(fig,'results/5_camera_sol_3', 'epsc')
 fig = figure;
 plot_camera(P1,w,h,'b');
 plot_camera(Pc2{4},w,h,'g');
-%saveas(fig,strcat('results/camera_sol_4.png'))
+saveas(fig,'results/6_camera_sol_4', 'epsc')
 
 %% Reconstruct structure
 % ToDo: Choose a second camera candidate by triangulating a match.
@@ -175,14 +177,15 @@ r = interp2(double(Irgb{1}(:,:,1)), x1(1,:), x1(2,:));
 g = interp2(double(Irgb{1}(:,:,2)), x1(1,:), x1(2,:));
 b = interp2(double(Irgb{1}(:,:,3)), x1(1,:), x1(2,:));
 Xe = euclid(X);
-figure; hold on;
+fig = figure; hold on;
 plot_camera(P1,w,h,'b');
 plot_camera(P2,w,h,'b');
 for i = 1:length(Xe)
     scatter3(Xe(1,i), Xe(3,i), -Xe(2,i), 5^2, [r(i) g(i) b(i)]/255, 'filled');
 end;
 axis equal;
-
+saveas(fig,'results/7_3D_points', 'epsc')
+hold off
 
 %% Compute reprojection error.
 
@@ -196,6 +199,7 @@ x_proj_cam2 = euclid(P2*X);
 err_cam1 = sqrt(sum(x_proj_cam1-x1).^2);
 err_cam2 = sqrt(sum(x_proj_cam2-x2).^2);
 
+fig = figure()
 h1 = histogram(err_cam1);
 hold on
 h2 = histogram(err_cam2);
@@ -204,6 +208,8 @@ mean_err2 = mean(err_cam2);
 total_mean = (mean_err1+mean_err2)/2;
 line([total_mean total_mean], ylim, 'Color','g');
 legend('hist error camera 1', 'hist error camera 2', 'mean error value');
+hold off
+saveas(fig,'results/8_histogram_error', 'epsc')
 
 % Irgb{1} = imread('Data/0001_s.png');
 % Irgb{2} = imread('Data/0002_s.png');
@@ -281,9 +287,10 @@ I_left = double(rgb2gray(imread('Data/scene1.row3.col3.ppm')));
 I_right = double(rgb2gray(imread('Data/scene1.row3.col4.ppm')));
 disparity_gt = imread('Data/truedisp.row3.col3.pgm');
 
-figure;
+fig = figure;
 imshow(disparity_gt);
 title('Disparity ground-truth')
+saveas(fig,'results/9_disparity_gt', 'epsc')
 
 
 min_disp = 0;
@@ -293,9 +300,10 @@ w_size = 20; %Try 3, 9, 20, 30 values
 disparity_map = stereo_computation(I_left, I_right, ...
     min_disp, max_disp, w_size, 'SSD');
 
-figure;
+fig = figure;
 imshow(disparity_map / max(max(disparity_map)));
 title('Disparity SSD')
+saveas(fig,'results/10_disparity_SSD', 'epsc')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. Depth map computation with local methods (NCC)
@@ -325,6 +333,7 @@ disparity_map = stereo_computation(I_left, I_right, ...
 figure;
 imshow(disparity_map / max(max(disparity_map)));
 title('Disparity NCC')
+saveas(fig,'results/11_disparity_NCC', 'epsc')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. Depth map computation with local methods
