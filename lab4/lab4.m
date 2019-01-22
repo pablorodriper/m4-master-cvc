@@ -284,7 +284,7 @@ title('Disparity ground-truth')
 
 min_disp = 0;
 max_disp = 16;
-w_size = 20; %Try 3, 9, 20, 30 values
+w_size = 30; %Try 3, 9, 20, 30 values
 
 disparity_map = stereo_computation(I_left, I_right, ...
     min_disp, max_disp, w_size, 'SSD');
@@ -332,6 +332,22 @@ title('Disparity NCC')
 % results.
 % Notice that in this new data the minimum and maximum disparities may
 % change.
+
+I_left = double(rgb2gray(imread('Data/0001_rectified_s.png')));
+I_right = double(rgb2gray(imread('Data/0002_rectified_s.png')));
+
+
+
+min_disp = 0;
+max_disp = 80;
+%w_size = 40; %Try 3, 9, 20, 30 values
+w_size = 30;
+disparity_map = stereo_computation(I_left, I_right, ...
+    min_disp, max_disp, w_size, 'SSD');
+
+figure;
+imshow(disparity_map / max(max(disparity_map)));
+title('Disparity NCC')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 6. Bilateral weights
