@@ -128,18 +128,22 @@ Pc2{4} = K*[R_1 -t];
 
 
 % plot the first camera and the four possible solutions for the second
-figure;
-plot_camera(P1,w,h);
-plot_camera(Pc2{1},w,h);
-figure;
-plot_camera(P1,w,h);
-plot_camera(Pc2{2},w,h);
-figure;
-plot_camera(P1,w,h);
-plot_camera(Pc2{3},w,h);
-figure;
-plot_camera(P1,w,h);
-plot_camera(Pc2{4},w,h);
+fig = figure;
+plot_camera(P1,w,h,'b');
+plot_camera(Pc2{1},w,h,'g');
+%saveas(fig,strcat('results/camera_sol_1.png'))
+fig = figure;
+plot_camera(P1,w,h,'b');
+plot_camera(Pc2{2},w,h,'g');
+%saveas(fig,strcat('results/camera_sol_2.png'))
+fig = figure;
+plot_camera(P1,w,h,'b');
+plot_camera(Pc2{3},w,h,'g');
+%saveas(fig,strcat('results/camera_sol_3.png'))
+fig = figure;
+plot_camera(P1,w,h,'b');
+plot_camera(Pc2{4},w,h,'g');
+%saveas(fig,strcat('results/camera_sol_4.png'))
 
 %% Reconstruct structure
 % ToDo: Choose a second camera candidate by triangulating a match.
@@ -172,8 +176,8 @@ g = interp2(double(Irgb{1}(:,:,2)), x1(1,:), x1(2,:));
 b = interp2(double(Irgb{1}(:,:,3)), x1(1,:), x1(2,:));
 Xe = euclid(X);
 figure; hold on;
-plot_camera(P1,w,h);
-plot_camera(P2,w,h);
+plot_camera(P1,w,h,'b');
+plot_camera(P2,w,h,'b');
 for i = 1:length(Xe)
     scatter3(Xe(1,i), Xe(3,i), -Xe(2,i), 5^2, [r(i) g(i) b(i)]/255, 'filled');
 end;
