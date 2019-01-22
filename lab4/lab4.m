@@ -63,7 +63,7 @@ matches = siftmatch(descr{1}, descr{2});
 % Plot matches.
 fig = figure();
 plotmatches(I{1}, I{2}, points{1}, points{2}, matches, 'Stacking', 'v');
-saveas(fig,'results/1_facace_with_outliers', 'epsc');
+saveas(fig,'results/1_facade_with_outliers', 'epsc');
 
 
 %% Fit Fundamental matrix and remove outliers.
@@ -75,7 +75,7 @@ x2 = points{2}(:, matches(2, :));
 inlier_matches = matches(:, inliers);
 fig = figure;
 plotmatches(I{1}, I{2}, points{1}, points{2}, inlier_matches, 'Stacking', 'v');
-saveas(fig,'results/2_facace_without_outliers', 'epsc')
+saveas(fig,'results/2_facade_without_outliers', 'epsc')
 
 x1 = points{1}(:, inlier_matches(1, :));
 x2 = points{2}(:, inlier_matches(2, :));
@@ -322,7 +322,6 @@ figure;
 imshow(disparity_gt);
 title('Disparity ground-truth')
 
-
 min_disp = 0;
 max_disp = 16;
 w_size = 20; %Try 3, 9, 20, 30 values
@@ -356,6 +355,26 @@ saveas(fig,'results/11_disparity_NCC', 'epsc')
 % Comment the results and compare them to the previous results (no weights).
 %
 % Note: Use grayscale images (the paper uses color images)
+
+I_left = double(rgb2gray(imread('Data/scene1.row3.col3.ppm')));
+I_right = double(rgb2gray(imread('Data/scene1.row3.col4.ppm')));
+disparity_gt = imread('Data/truedisp.row3.col3.pgm');
+
+%figure;
+%imshow(disparity_gt);
+%title('Disparity ground-truth')
+
+min_disp = 0;
+max_disp = 16;
+w_size = 29;
+
+disparity_map = stereo_computation_asdf(I_left, I_right, ...
+    min_disp, max_disp, w_size, 'ASW');
+
+fig = figure;
+imshow(disparity_map / max(max(disparity_map)));
+%title('Adaptive Support Weights')
+%saveas(fig,'results/Adaptive_support_weights', 'epsc')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% OPTIONAL:  Stereo computation with Belief Propagation
