@@ -2,7 +2,7 @@
 %% Lab 4: Reconstruction from two views (knowing internal camera parameters) 
 
 
-addpath('sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
+addpath('../lab2/sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Triangulation
@@ -182,6 +182,25 @@ axis equal;
 % Note 2: For this first set of images use 0 as minimum disparity 
 % and 16 as the the maximum one.
 
+I_left = double(rgb2gray(imread('Data/scene1.row3.col3.ppm')));
+I_right = double(rgb2gray(imread('Data/scene1.row3.col4.ppm')));
+disparity_gt = imread('Data/truedisp.row3.col3.pgm');
+
+figure;
+imshow(disparity_gt);
+title('Disparity ground-truth')
+
+
+min_disp = 0;
+max_disp = 16;
+w_size = 20; %Try 3, 9, 20, 30 values
+
+disparity_map = stereo_computation(I_left, I_right, ...
+    min_disp, max_disp, w_size, 'SSD');
+
+figure;
+imshow(disparity_map / max(max(disparity_map)));
+title('Disparity SSD')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. Depth map computation with local methods (NCC)
@@ -191,6 +210,26 @@ axis equal;
 %
 % Evaluate the results changing the window size (e.g. 3x3, 9x9, 20x20,
 % 30x30) and the matching cost. Comment the results.
+
+I_left = double(rgb2gray(imread('Data/scene1.row3.col3.ppm')));
+I_right = double(rgb2gray(imread('Data/scene1.row3.col4.ppm')));
+disparity_gt = imread('Data/truedisp.row3.col3.pgm');
+
+figure;
+imshow(disparity_gt);
+title('Disparity ground-truth')
+
+
+min_disp = 0;
+max_disp = 16;
+w_size = 20; %Try 3, 9, 20, 30 values
+
+disparity_map = stereo_computation(I_left, I_right, ...
+    min_disp, max_disp, w_size, 'NCC');
+
+figure;
+imshow(disparity_map / max(max(disparity_map)));
+title('Disparity NCC')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. Depth map computation with local methods
