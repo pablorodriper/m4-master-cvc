@@ -1,8 +1,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Lab 4: Reconstruction from two views (knowing internal camera parameters)
 
-
 addpath('../lab2/sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
+iptsetpref('ImshowBorder','tight')  % Save images without border
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Triangulation
@@ -36,7 +36,7 @@ for i = 1:N_test
 end
 
 % error
-euclid(X_test) - euclid(X_trian)
+triang_error = euclid(X_test) - euclid(X_trian)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -63,7 +63,7 @@ matches = siftmatch(descr{1}, descr{2});
 % Plot matches.
 fig = figure();
 plotmatches(I{1}, I{2}, points{1}, points{2}, matches, 'Stacking', 'v');
-saveas(fig,'results/1_facade_with_outliers', 'epsc');
+%saveas(fig,'results/1_facade_with_outliers', 'epsc');
 
 
 %% Fit Fundamental matrix and remove outliers.
@@ -75,14 +75,12 @@ x2 = points{2}(:, matches(2, :));
 inlier_matches = matches(:, inliers);
 fig = figure;
 plotmatches(I{1}, I{2}, points{1}, points{2}, inlier_matches, 'Stacking', 'v');
-saveas(fig,'results/2_facade_without_outliers', 'epsc')
+%saveas(fig,'results/2_facade_without_outliers', 'epsc')
 
 x1 = points{1}(:, inlier_matches(1, :));
 x2 = points{2}(:, inlier_matches(2, :));
 
 %vgg_gui_F(Irgb{1}, Irgb{2}, F');
-
-
 
 
 %% Compute candidate camera matrices.
@@ -94,10 +92,8 @@ scale = 0.3;
 H = [scale 0 0; 0 scale 0; 0 0 1];
 K = H * K;
 
-
 % ToDo: Compute the Essential matrix from the Fundamental matrix
 E = K' * F * K;
-
 
 % ToDo: write the camera projection matrix for the first camera
 P1 = K*eye(3,4);
@@ -127,39 +123,36 @@ Pc2{2} = K*[R -t];
 Pc2{3} = K*[R_1 t];
 Pc2{4} = K*[R_1 -t];
 
-
-
 % plot the first camera and the four possible solutions for the second
 fig = figure;
 plot_camera(P1,w,h,'b');
 plot_camera(Pc2{1},w,h,'g');
-saveas(fig,'results/3_camera_sol_1', 'epsc')
+%saveas(fig,'results/3_camera_sol_1', 'epsc')
 fig = figure;
 plot_camera(P1,w,h,'b');
 plot_camera(Pc2{2},w,h,'g');
-saveas(fig,'results/4_camera_sol_2', 'epsc')
+%saveas(fig,'results/4_camera_sol_2', 'epsc')
 fig = figure;
 plot_camera(P1,w,h,'b');
 plot_camera(Pc2{3},w,h,'g');
-saveas(fig,'results/5_camera_sol_3', 'epsc')
+%saveas(fig,'results/5_camera_sol_3', 'epsc')
 fig = figure;
 plot_camera(P1,w,h,'b');
 plot_camera(Pc2{4},w,h,'g');
-saveas(fig,'results/6_camera_sol_4', 'epsc')
+%saveas(fig,'results/6_camera_sol_4', 'epsc')
 
 %% Reconstruct structure
 % ToDo: Choose a second camera candidate by triangulating a match.
 % P2 = ...
-P2_idx = 0
+P2_idx = 0;
 for i=1:length(Pc2)
    X_aux = triangulate(x1(:,1), x2(:,1), P1, Pc2{i}, [w h]);
-   X_auc_ec = euclid(X_aux)
-   proj1 =  P1 * X_aux
-   proj2 = Pc2{i} * X_aux
+   X_auc_ec = euclid(X_aux);
+   proj1 =  P1 * X_aux;
+   proj2 = Pc2{i} * X_aux;
    if (proj1(3) >= 0) && (proj2(3) >= 0)
         P2_idx = i;
-    end
-           
+   end      
 end
 
 P2 = Pc2{P2_idx};
@@ -184,7 +177,7 @@ for i = 1:length(Xe)
     scatter3(Xe(1,i), Xe(3,i), -Xe(2,i), 5^2, [r(i) g(i) b(i)]/255, 'filled');
 end;
 axis equal;
-saveas(fig,'results/7_3D_points', 'epsc')
+%saveas(fig,'results/7_3D_points', 'epsc')
 hold off
 
 %% Compute reprojection error.
@@ -209,52 +202,7 @@ total_mean = (mean_err1+mean_err2)/2;
 line([total_mean total_mean], ylim, 'Color','g');
 legend('hist error camera 1', 'hist error camera 2', 'mean error value');
 hold off
-saveas(fig,'results/8_histogram_error', 'epsc')
-
-% Irgb{1} = imread('Data/0001_s.png');
-% Irgb{2} = imread('Data/0002_s.png');
-% I{1} = sum(double(Irgb{1}), 3) / 3 / 255;
-% I{2} = sum(double(Irgb{2}), 3) / 3 / 255;
-% [h,w] = size(I{1});
-% 
-% points = cell(2,1);
-% descr = cell(2,1);
-% for i = 1:2
-%     [points{i}, descr{i}] = sift(I{i}, 'Threshold', 0.01);
-%     points{i} = points{i}(1:2,:);
-% end
-% 
-% matches = siftmatch(descr{1}, descr{2});
-% 
-% % Plot matches.
-% % figure();
-% % plotmatches(I{1}, I{2}, points{1}, points{2}, matches, 'Stacking', 'v');
-% 
-% % Fit Fundamental matrix and remove outliers.
-% x1 = points{1}(:, matches(1, :));
-% x2 = points{2}(:, matches(2, :));
-% [F, inliers] = ransac_fundamental_matrix(homog(x1), homog(x2), 2.0);
-% 
-% % Plot inliers.
-% inlier_matches = matches(:, inliers);
-% % figure;
-% % plotmatches(I{1}, I{2}, points{1}, points{2}, inlier_matches, 'Stacking', 'v');
-% 
-% x1 = points{1}(:, inlier_matches(1, :));
-% x2 = points{2}(:, inlier_matches(2, :));
-% 
-% P1 = eye(3,4);
-% c = cosd(15); s = sind(15);
-% R = [c -s 0; s c 0; 0 0 1];
-% t = [.3 0.1 0.2]';
-% P2 = [R t];
-% 
-% N = size(x1,2);
-% X = zeros(4,N);
-% 
-% for i = 1:N
-%     X(:,i) = triangulate(x1(:,i), x2(:,i), P1, P2, [w h]);
-% end
+%saveas(fig,'results/8_histogram_error', 'epsc')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Depth map computation with local methods (SSD)
@@ -292,7 +240,6 @@ imshow(disparity_gt);
 title('Disparity ground-truth')
 saveas(fig,'results/9_disparity_gt', 'epsc')
 
-
 min_disp = 0;
 max_disp = 16;
 w_size = 30; %Try 3, 9, 20, 30 values
@@ -303,7 +250,7 @@ disparity_map = stereo_computation(I_left, I_right, ...
 fig = figure;
 imshow(disparity_map / max(max(disparity_map)));
 title('Disparity SSD')
-saveas(fig,'results/10_disparity_SSD', 'epsc')
+%saveas(fig,'results/10_disparity_SSD', 'epsc')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. Depth map computation with local methods (NCC)
@@ -332,7 +279,7 @@ disparity_map = stereo_computation(I_left, I_right, ...
 figure;
 imshow(disparity_map / max(max(disparity_map)));
 title('Disparity NCC')
-saveas(fig,'results/11_disparity_NCC', 'epsc')
+%saveas(fig,'results/11_disparity_NCC', 'epsc')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. Depth map computation with local methods
@@ -347,8 +294,6 @@ saveas(fig,'results/11_disparity_NCC', 'epsc')
 
 I_left = double(rgb2gray(imread('Data/0001_rectified_s.png')));
 I_right = double(rgb2gray(imread('Data/0002_rectified_s.png')));
-
-
 
 min_disp = 0;
 max_disp = 80;
@@ -372,17 +317,21 @@ title('Disparity NCC')
 %
 % Note: Use grayscale images (the paper uses color images)
 
-I_left = double(rgb2gray(imread('Data/scene1.row3.col3.ppm')));
-I_right = double(rgb2gray(imread('Data/scene1.row3.col4.ppm')));
-disparity_gt = imread('Data/truedisp.row3.col3.pgm');
+% I_left = double(rgb2gray(imread('Data/scene1.row3.col3.ppm')));
+% I_right = double(rgb2gray(imread('Data/scene1.row3.col4.ppm')));
+% disparity_gt = imread('Data/truedisp.row3.col3.pgm');
+
+I_left = double(rgb2gray(imread('Data/0001_rectified_s.png')));
+I_right = double(rgb2gray(imread('Data/0002_rectified_s.png')));
+%disparity_gt = imread('Data/truedisp.row3.col3.pgm');
 
 %figure;
 %imshow(disparity_gt);
 %title('Disparity ground-truth')
 
 min_disp = 0;
-max_disp = 16;
-w_size = 70;
+max_disp = 80;
+w_size = 30;
 
 disparity_map = stereo_computation_ASW(I_left, I_right, ...
     min_disp, max_disp, w_size, 'ASW');
@@ -390,7 +339,25 @@ disparity_map = stereo_computation_ASW(I_left, I_right, ...
 fig = figure;
 imshow(disparity_map / max(max(disparity_map)));
 %title('Adaptive Support Weights')
-%saveas(fig,'results/Adaptive_support_weights', 'epsc')
+%saveas(fig,'results/disparity_ASW_30', 'epsc')
+
+
+% facade with ASW
+
+I_left = double(rgb2gray(imread('Data/0001_rectified_s.png')));
+I_right = double(rgb2gray(imread('Data/0002_rectified_s.png')));
+
+min_disp = 0;
+max_disp = 80;
+w_size = 30;
+
+disparity_map = stereo_computation_ASW(I_left, I_right, ...
+    min_disp, max_disp, w_size, 'ASW');
+
+fig = figure;
+imshow(disparity_map / max(max(disparity_map)));
+%title('Adaptive Support Weights')
+%saveas(fig,'results/facade_ASW_30', 'epsc')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% OPTIONAL:  Stereo computation with Belief Propagation

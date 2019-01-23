@@ -41,8 +41,6 @@ I_left_pad = padarray(I_left_pad, [pad_size_right, pad_size_right], 0, 'post');
 I_right_pad = padarray(I_right, [pad_size_left, pad_size_left], 0, 'pre');
 I_right_pad = padarray(I_right_pad, [pad_size_right, pad_size_right], 0, 'post');
 
-    
-
 for i = 1+pad_size_left:n+pad_size_left
     for j = 1+pad_size_left:m+pad_size_left
         
@@ -66,12 +64,9 @@ for i = 1+pad_size_left:n+pad_size_left
         
         Ir_pos_interval = [left_pos right_pos];
         
-
-        
         %Set best score for each cost function
         best_distance = Inf;
 
-        
         %Go through all the possible values in the right image and compute
         %the distance with the chosen cost for picking minimum one        
         for pos_index = 1:length(Ir_pos_interval)
@@ -98,36 +93,8 @@ for i = 1+pad_size_left:n+pad_size_left
                     j_best = j_right;
                 end
             end
-            
-%             weight = 1/(w_size*w_size);
-%             if cost == 'SSD' %Sum of Squared Differences
-%                 distance = sum(sum(weight*(I_left_window-I_right_window).^2));
-%                 if (distance < best_distance)
-%                     best_distance = distance;
-%                     j_best = j_right;
-%                 end
-%             end
-%             if cost == 'NCC' %Normalized Cross Correlation
-%                 I_right_mean = sum(sum(I_right_window))*weight;
-%                 I_left_mean = sum(sum(I_left_window))*weight;
-%                 
-%                 I_right_sigma = sqrt(sum(sum((I_right_window-I_right_mean).^2))*weight);
-%                 I_left_sigma = sqrt(sum(sum((I_left_window-I_left_mean).^2))*weight);
-%                 
-%                 distance = sum(sum(weight*...
-%                     ((I_right_window-I_right_mean).*...
-%                     (I_left_window-I_left_mean))))/...
-%                     (I_right_sigma*I_left_sigma);
-%                 if (distance > best_distance)
-%                     best_distance = distance;
-%                     j_best = j_right;
-%                 end
-%             end
         end
-            
         disparity_map(i-pad_size_left, j-pad_size_left) = abs(j-j_best);
-        
-        
     end
 end
 end

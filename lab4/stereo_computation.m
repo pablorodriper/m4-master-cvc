@@ -33,7 +33,6 @@ I_right_pad = padarray(I_right, [pad_size_left, pad_size_left], 0, 'pre');
 I_right_pad = padarray(I_right_pad, [pad_size_right, pad_size_right], 0, 'post');
 
     
-
 for i = 1+pad_size_left:n+pad_size_left
     for j = 1+pad_size_left:m+pad_size_left
         
@@ -57,13 +56,11 @@ for i = 1+pad_size_left:n+pad_size_left
         
         Ir_pos_interval = [left_pos right_pos];
         
-
         
         %Set best score for each cost function
         if cost == 'SSD'
             best_distance = Inf;
-        end
-        if cost == 'NCC'
+        elseif cost == 'NCC'
             best_distance = -Inf;
         end
         
@@ -101,11 +98,7 @@ for i = 1+pad_size_left:n+pad_size_left
                 end
             end
         end
-            
-        disparity_map(i-pad_size_left, j-pad_size_left) = abs(j-j_best);
-        
-        
+        disparity_map(i-pad_size_left, j-pad_size_left) = abs(j-j_best);       
     end
 end
 end
-
