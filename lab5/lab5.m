@@ -257,6 +257,22 @@ v3p = vanishing_point(x2(:,1),x2(:,2),x2(:,4),x2(:,3));
 % ToDo: use the vanishing points to compute the matrix Hp that 
 %       upgrades the projective reconstruction to an affine reconstruction
 
+Pproj1 = Pproj(1:3, :);
+Pproj2 = Pproj(4:6, :);
+
+%Corresponding 3D points by triangulation
+point_1 = triangulate(euclid(v1), euclid(v1p), Pproj1, Pproj2, [w, h]);
+point_2 = triangulate(euclid(v2), euclid(v2p), Pproj1, Pproj2, [w, h]);
+point_3 = triangulate(euclid(v3), euclid(v3p), Pproj1, Pproj2, [w, h]);
+
+X = [point_1'; point_2'; point_3'];
+
+p = null(X);
+
+p = p/p(end);
+
+Hp = [1 0 0 0; 0 1 0 0; 0 0 1 0; p(1) p(2) p(3) p(4)];
+
 
 %% check results
 
