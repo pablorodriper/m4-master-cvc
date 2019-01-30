@@ -36,8 +36,8 @@ F11= fundamental_matrix(x1, x1);
 e11 = V(:,3) / V(3,3);
 
 
-F21 = fundamental_matrix(x1, x2);
-[U, D, V] = svd(F21');
+F21 = fundamental_matrix(x2, x1);
+[U, D, V] = svd(F21);
 e21 = V(:,3) / V(3,3);
 
 % 3. Determine the scale factors (using equation (3))
@@ -78,7 +78,7 @@ while(criteria > 0.1)
     %would be sufficient to balance only the lambda	matrix instead of W
     change = 100000;
     d_lambda = 0;
-    while(change > 0.3)
+    while(change > 0.1)
         
         lambda_old = lambda;
         d_lambda_old= d_lambda;
@@ -96,7 +96,7 @@ while(criteria > 0.1)
             lambda(i,:) = lambda(i,:) ./ normalize_row;
         end
         %5.3 If the entries changed significantly, repeat 1 and 2
-        d_lambda = sqrt(sum((lambda_old - lambda).^2))
+        d_lambda = norm(lambda_old - lambda)^2
         change = abs(d_lambda - d_lambda_old)/d_lambda;
     end
 
@@ -120,21 +120,24 @@ while(criteria > 0.1)
     d_old = d;
     for j=1:Npoints
          Px1 = Pproj(1:3,:) * Xproj;
-         d1 = sqrt(sum((norm_x1(:,j) - Px1(:,j)).^2));
+         Px1 = euclid(Px1);
+         d1 = norm(euclid(norm_x1(:,j)) - Px1(:,j))^2;
 
          Px2 = Pproj(4:6,:) * Xproj;
-         d2 = sqrt(sum((norm_x2(:,j) - Px2(:,j)).^2));
+         Px2 = euclid(Px2);
+         d2 = norm(euclid(norm_x2(:,j)) - Px2(:,j))^2;
     end
     d = d1 + d2;
+    d = d / (Npoints * Ncam);
     
     %8. Adapt projective motion, to account for the normalization
     %transformation of step 1
+%     W_new = cat(1, Px1, Px2)
+%     lambda(1,:) = W_new(1,:);
+%     lambda(2,:) = W_new(4,:);
+    
     Pproj(1:3,:) = T1\Pproj(1:3,:); 
     Pproj(4:6,:) = T2\Pproj(4:6,:);
-    W_new = cat(1, Px1, Px2)
-    lambda(1,:) = W_new(1,:);
-    lambda(2,:) = W_new(4,:);
-    
     criteria = (abs(d - d_old)/d)
     
 end
