@@ -92,7 +92,7 @@ plot_camera2(P1,w,h);
 plot_camera2(P2,w,h);
 for i = 1:length(X)
     scatter3(X(1,i), X(2,i), X(3,i), 5^2, [0.5 0.5 0.5], 'filled');
-end;
+end
 axis equal;
 axis vis3d;
 
@@ -168,6 +168,9 @@ x2(3,:) = x2(3,:)./x2(3,:);
 % and stop when (abs(d - d_old)/d) < 0.1 where d_old is the distance
 % in the previous iteration.
 
+[Pproj, Xproj] = factorization_method(Xh, x1, x2, flag);
+
+
 %% Check projected points (estimated and data points)
 
 for i=1:2
@@ -179,7 +182,7 @@ x_d{2} = euclid(P2*Xh);
 % image 1
 figure;
 hold on
-plot(x_d{1}(1,:),x_d{1}(2,:),'r*');
+plot(x_d{1}(1,:),x_d{1}(2,:),'r*'); 
 plot(x_proj{1}(1,:),x_proj{1}(2,:),'bo');
 axis equal
 
@@ -445,7 +448,7 @@ figure; hold on;
 [w,h] = size(I{1});
 for i = 1:length(Xe)
     scatter3(Xe(1,i), Xe(2,i), Xe(3,i), 2^2, [r(i) g(i) b(i)], 'filled');
-end;
+end
 axis equal;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -461,6 +464,25 @@ axis equal;
 % by computing two possible projection matrices from the fundamental matrix
 % and one of the epipoles.
 % Then update the reconstruction to affine and metric as before (reuse the code).
+
+% The first projection matrix is always 
+P1 = [eye(3,3) zeros(3,1)]
+
+% Given the fundamental matrix
+F = fundamental_matrix(x1, x2);
+
+% Calculate e' from e'^T*F = 0
+[U, D, V] = svd(F);
+e = V(:,3) / V(3,3);
+skew_e =[0 -e(3) e(2) ; e(3) 0 -e(1) ; -e(2) e(1) 0 ];
+
+P2 = [skew_e*F e]
+
+if (rank(P2) == 3)
+    'rank of P2 = 3';
+end
+
+% toDo: update the reconstruction to affine and metric as before (reuse the code).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 8. OPTIONAL: Projective reconstruction from more than two views

@@ -34,7 +34,7 @@ F11= fundamental_matrix(x1, x1);
 [U, D, V] = svd(F11);
 %e proportional to last column of V
 e11 = V(:,3) / V(3,3);
-criteria = 1;
+
 
 F21 = fundamental_matrix(x1, x2);
 [U, D, V] = svd(F21');
@@ -67,31 +67,78 @@ else
      end
      
 end
+criteria = 100000;
+d = 0;
 
-while(criteria < 0.1)
+while(criteria > 0.1)
     
-    % 4. Build the rescaled measurement matrix W
+% 5. Balance W by column-wise and “triplet-of-rows”-wise scalar 
+    % mutliplication
+    %Note that, since we work with normalized image coordinates q it 
+    %would be sufficient to balance only the lambda	matrix instead of W
+    change = 100000;
+    d_lambda = 0;
+    while(change > 0.3)
+        
+        lambda_old = lambda;
+        d_lambda_old= d_lambda;
+        %5.1 Rescale each colum
+        for i=1:Npoints
+
+            normalize_col = sqrt(sum(lambda(:,i).^2)); 
+            lambda(:,i) = lambda(:,i) ./ normalize_col;
+
+        end
+        %5.2  Rescale each triplet of rows of W, so lambda(1,:) one time,
+        %lambda (2,:) other time, because lambda 
+        for i=1:Ncam
+            normalize_row = sqrt(sum(lambda(i,:).^2)); 
+            lambda(i,:) = lambda(i,:) ./ normalize_row;
+        end
+        %5.3 If the entries changed significantly, repeat 1 and 2
+        d_lambda = sqrt(sum((lambda_old - lambda).^2))
+        change = abs(d_lambda - d_lambda_old)/d_lambda;
+    end
+
+    
+% 4. Build the rescaled measurement matrix W
     W = zeros(3*Ncam, Npoints);
-    A = lambda(1,:) .* x1; 
-    B= lambda(2,:) .* x2;
+    A = lambda(1,:) .* norm_x1; 
+    B= lambda(2,:) .* norm_x2;
     W = cat(1, A, B);
 
-    % 5. Balance W by column-wise and “triplet-of-rows”-wise scalar 
-    % mutliplication
+    
 
     % 6. Compute the SVD of the balanced matrix W
-    [U,D,V] = svd(M);
+    [U,D,V] = svd(W);
     
     %7. From the SVD, recover projective motion and shape
+    D = sqrt(D(1:4,1:4));
+    Pproj = U(:,1:4) * D;
+    Xproj = D * V(:,1:4)';
+    
+    d_old = d;
+    for j=1:Npoints
+         Px1 = Pproj(1:3,:) * Xproj;
+         d1 = sqrt(sum((norm_x1(:,j) - Px1(:,j)).^2));
+
+         Px2 = Pproj(4:6,:) * Xproj;
+         d2 = sqrt(sum((norm_x2(:,j) - Px2(:,j)).^2));
+    end
+    d = d1 + d2;
     
     %8. Adapt projective motion, to account for the normalization
     %transformation of step 1
+    Pproj(1:3,:) = T1\Pproj(1:3,:); 
+    Pproj(4:6,:) = T2\Pproj(4:6,:);
+    W_new = cat(1, Px1, Px2)
+    lambda(1,:) = W_new(1,:);
+    lambda(2,:) = W_new(4,:);
     
-    d_old = d;
-    d=0;
-    criteria = (abs(d - d_old)/d); 
- 
+    criteria = (abs(d - d_old)/d)
+    
 end
+
 
     
 end
