@@ -323,9 +323,32 @@ axis equal
 % Use the following vanishing points given by three pair of orthogonal lines
 % and assume that the skew factor is zero and that pixels are square
 
-v1 = vanishing_point(x1(:,2),x1(:,5),x1(:,3),x1(:,6));
-v2 = vanishing_point(x1(:,1),x1(:,2),x1(:,3),x1(:,4));
-v3 = vanishing_point(x1(:,1),x1(:,4),x1(:,2),x1(:,3));
+u = vanishing_point(x1(:,2),x1(:,5),x1(:,3),x1(:,6));
+v = vanishing_point(x1(:,1),x1(:,2),x1(:,3),x1(:,4));
+z = vanishing_point(x1(:,1),x1(:,4),x1(:,2),x1(:,3));
+
+A = [u(1)*v(1) u(1)*v(2)+u(2)*v(1) u(1)*v(3)+u(3)*v(1) u(2)*v(2) u(2)*v(3)+u(3)*v(2) u(3)*v(3);
+     u(1)*z(1) u(1)*z(2)+u(2)*z(1) u(1)*z(3)+u(3)*z(1) u(2)*z(2) u(2)*z(3)+u(3)*z(2) u(3)*z(3);
+     v(1)*z(1) v(1)*z(2)+v(2)*z(1) v(1)*z(3)+v(3)*z(1) v(2)*z(2) v(2)*z(3)+v(3)*z(2) v(3)*z(3);
+         0              1                   0              0              0              0;
+         1              0                   0              -1             0              0];
+
+ w_nulls = null(A);
+ 
+ w = w_nulls(:,1);
+ 
+ w = [w(1) w(2) w(3);
+      w(2) w(4) w(5);
+      w(3) w(5) w(6)];
+ 
+ P = Pproj(1:3, :)*inv(Hp);
+ M = P(:,1:end-1);
+ 
+ A = chol(inv(M'*w*M));
+ 
+Ha = eye(4,4);
+Ha(1:3,1:3) = inv(A);
+ 
 
 %% check results
 
