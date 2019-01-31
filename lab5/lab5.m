@@ -67,8 +67,8 @@ K = [709 0 450; 0 709 300; 0 0 1];
 Rz = [cos(0.88*pi/2) -sin(0.88*pi/2) 0; sin(0.88*pi/2) cos(0.88*pi/2) 0; 0 0 1];
 Ry = [cos(0.88*pi/2) 0 sin(0.88*pi/2); 0 1 0; -sin(0.88*pi/2) 0 cos(0.88*pi/2)];
 R1 = Rz*Ry;
-t1 = -R1*[40; 10; 5];
-%t1 = -R1*[42; 5; 10];  % Email Gloria
+%t1 = -R1*[40; 10; 5];
+t1 = -R1*[42; 5; 10];  % Email Gloria
 
 Rz = [cos(0.8*pi/2) -sin(0.8*pi/2) 0; sin(0.8*pi/2) cos(0.8*pi/2) 0; 0 0 1];
 Ry = [cos(0.88*pi/2) 0 sin(0.88*pi/2); 0 1 0; -sin(0.88*pi/2) 0 cos(0.88*pi/2)];
@@ -347,11 +347,11 @@ w = [w(1) w(2) w(3);
      w(2) w(4) w(5);
      w(3) w(5) w(6)];
  
-P = Pproj(1:3, :)*inv(Hp);
-M = P(:,3);
+P = Pproj(1:3,:)*inv(Hp);
+M = P(:,1:3);
  
 A = chol(inv(M'*w*M));
- 
+
 Ha = eye(4,4);
 Ha(1:3,1:3) = inv(A);
  
@@ -493,8 +493,8 @@ acceleration = 0;
 focal_ratio = 1;
 params.PRINT = 1;
 params.PLOT = 1;
-[horizon, VPs] = detect_vps(img_in, folder_out, manhattan, acceleration, focal_ratio, params);
-
+%[horizon, VPs] = detect_vps(img_in, folder_out, manhattan, acceleration, focal_ratio, params);
+load VPs.mat
 
 
 %% Visualize the result
