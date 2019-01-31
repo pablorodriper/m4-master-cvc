@@ -486,21 +486,52 @@ plot(x_proj{2}(1,:),x_proj{2}(2,:),'bo');
 % This is an example on how to obtain the vanishing points (VPs) from three
 % orthogonal lines in image 1
 
+w = size(Irgb{1},1);
+h = size(Irgb{1},2);
+
 img_in =  'Data/0000_s.png'; % input image
-folder_out = '.'; % output folder
-manhattan = 1;
-acceleration = 0;
-focal_ratio = 1;
-params.PRINT = 1;
-params.PLOT = 1;
-%[horizon, VPs] = detect_vps(img_in, folder_out, manhattan, acceleration, focal_ratio, params);
-load VPs.mat
+
+% folder_out = '.'; % output folder
+% manhattan = 1;
+% acceleration = 0;
+% focal_ratio = 1;
+% params.PRINT = 1;
+% params.PLOT = 1;
+% [horizon, VPs] = detect_vps(img_in, folder_out, manhattan, acceleration, focal_ratio, params);
+params = load('VPs.mat');
+
+% Compute the vanishing points in each image
+v1 = params.VPs_0(:,1);
+v2 = params.VPs_0(:,2);
+v3 = params.VPs_0(:,3);
+
+v1p = params.VPs_1(:,1);
+v2p = params.VPs_1(:,2);
+v3p = params.VPs_1(:,3);
+
+Pproj1 = Pproj(1:3, :);
+Pproj2 = Pproj(4:6, :);
+
+%Corresponding 3D points by triangulation
+point_1 = triangulate(v1, v1p, Pproj1, Pproj2, [w, h]);
+point_2 = triangulate(v2, v2p, Pproj1, Pproj2, [w, h]);
+point_3 = triangulate(v3, v3p, Pproj1, Pproj2, [w, h]);
+
+X = [point_1'; point_2'; point_3'];
+
+p = null(X);
+
+p = p/p(end);
+
+Hp = [1 0 0 0; 0 1 0 0; 0 0 1 0; p(1) p(2) p(3) p(4)];
 
 
 %% Visualize the result
 
 % x1m are the data points in image 1
 % Xm are the reconstructed 3D points (projective reconstruction)
+x1m = x_d{1};
+Xm = Xproj;
 
 r = interp2(double(Irgb{1}(:,:,1)), x1m(1,:), x1m(2,:));
 g = interp2(double(Irgb{1}(:,:,2)), x1m(1,:), x1m(2,:));
@@ -518,6 +549,78 @@ axis equal;
 
 % ToDo: compute the matrix Ha that updates the affine reconstruction
 % to a metric one and visualize the result in 3D as in the previous section
+
+u = homog(params.VPs_0(:,1));
+v = homog(params.VPs_0(:,2));
+z = homog(params.VPs_0(:,3));
+
+% u = [params.VPs_0(:,1);0.0001];
+% v = [params.VPs_0(:,2);0.0001];
+% z = [params.VPs_0(:,3);0.0001];
+
+
+A = [u(1)*v(1) u(1)*v(2)+u(2)*v(1) u(1)*v(3)+u(3)*v(1) u(2)*v(2) u(2)*v(3)+u(3)*v(2) u(3)*v(3);
+     u(1)*z(1) u(1)*z(2)+u(2)*z(1) u(1)*z(3)+u(3)*z(1) u(2)*z(2) u(2)*z(3)+u(3)*z(2) u(3)*z(3);
+     v(1)*z(1) v(1)*z(2)+v(2)*z(1) v(1)*z(3)+v(3)*z(1) v(2)*z(2) v(2)*z(3)+v(3)*z(2) v(3)*z(3);
+         0              1                   0              0              0              0;
+         1              0                   0              -1             0              0];
+
+[U,D,V] = svd(A);
+ 
+w = V(:,end);
+ 
+w = [w(1) w(2) w(3);
+     w(2) w(4) w(5);
+     w(3) w(5) w(6)];
+ 
+P = Pproj(1:3, :)*inv(Hp);
+M = P(:,1:3);
+ 
+A = chol(inv(M'*w*M));
+ 
+Ha = eye(4,4);
+Ha(1:3,1:3) = inv(A);
+
+%% check results
+
+Xa = euclid(Ha*Hp*Xproj);
+figure;
+hold on;
+X1 = Xa(:,1); X2 = Xa(:,2); X3 = Xa(:,3); X4 = Xa(:,4);
+plot3([X1(1) X2(1)], [X1(2) X2(2)], [X1(3) X2(3)]);
+plot3([X3(1) X4(1)], [X3(2) X4(2)], [X3(3) X4(3)]);
+X5 = Xa(:,5); X6 = Xa(:,6); X7 = X2; X8 = X3;
+plot3([X5(1) X6(1)], [X5(2) X6(2)], [X5(3) X6(3)]);
+plot3([X7(1) X8(1)], [X7(2) X8(2)], [X7(3) X8(3)]);
+plot3([X5(1) X7(1)], [X5(2) X7(2)], [X5(3) X7(3)]);
+plot3([X6(1) X8(1)], [X6(2) X8(2)], [X6(3) X8(3)]);
+X5 = Xa(:,7); X6 = Xa(:,8); X7 = X1; X8 = X4;
+plot3([X5(1) X6(1)], [X5(2) X6(2)], [X5(3) X6(3)]);
+plot3([X7(1) X8(1)], [X7(2) X8(2)], [X7(3) X8(3)]);
+plot3([X5(1) X7(1)], [X5(2) X7(2)], [X5(3) X7(3)]);
+plot3([X6(1) X8(1)], [X6(2) X8(2)], [X6(3) X8(3)]);
+X5 = Xa(:,9); X6 = Xa(:,10); X7 = Xa(:,11); X8 = Xa(:,12);
+plot3([X5(1) X6(1)], [X5(2) X6(2)], [X5(3) X6(3)]);
+plot3([X7(1) X8(1)], [X7(2) X8(2)], [X7(3) X8(3)]);
+plot3([X5(1) X7(1)], [X5(2) X7(2)], [X5(3) X7(3)]);
+plot3([X6(1) X8(1)], [X6(2) X8(2)], [X6(3) X8(3)]);
+X5 = Xa(:,13); X6 = Xa(:,14); X7 = Xa(:,15); X8 = Xa(:,16);
+plot3([X5(1) X6(1)], [X5(2) X6(2)], [X5(3) X6(3)]);
+plot3([X7(1) X8(1)], [X7(2) X8(2)], [X7(3) X8(3)]);
+plot3([X5(1) X7(1)], [X5(2) X7(2)], [X5(3) X7(3)]);
+plot3([X6(1) X8(1)], [X6(2) X8(2)], [X6(3) X8(3)]);
+X5 = Xa(:,17); X6 = Xa(:,18); X7 = Xa(:,19); X8 = Xa(:,20);
+plot3([X5(1) X6(1)], [X5(2) X6(2)], [X5(3) X6(3)]);
+plot3([X7(1) X8(1)], [X7(2) X8(2)], [X7(3) X8(3)]);
+plot3([X5(1) X7(1)], [X5(2) X7(2)], [X5(3) X7(3)]);
+plot3([X6(1) X8(1)], [X6(2) X8(2)], [X6(3) X8(3)]);
+X5 = Xa(:,21); X6 = Xa(:,22); X7 = Xa(:,23); X8 = Xa(:,24);
+plot3([X5(1) X6(1)], [X5(2) X6(2)], [X5(3) X6(3)]);
+plot3([X7(1) X8(1)], [X7(2) X8(2)], [X7(3) X8(3)]);
+plot3([X5(1) X7(1)], [X5(2) X7(2)], [X5(3) X7(3)]);
+plot3([X6(1) X8(1)], [X6(2) X8(2)], [X6(3) X8(3)]);
+axis vis3d
+axis equal
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 7. OPTIONAL: Projective reconstruction from two views
