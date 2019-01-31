@@ -2,7 +2,9 @@
 %% Lab 5: Reconstruction from uncalibrated viewas
 
 addpath('../lab2/sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
+addpath('Data');
 iptsetpref('ImshowBorder','tight')  % Save images without border
+addpath(genpath('vanishing_points_v0.9/'));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 0. Create synthetic data
