@@ -339,18 +339,18 @@ A = [u(1)*v(1) u(1)*v(2)+u(2)*v(1) u(1)*v(3)+u(3)*v(1) u(2)*v(2) u(2)*v(3)+u(3)*
          0              1                   0              0              0              0;
          1              0                   0              -1             0              0];
 
- [U,D,V] = svd(A);
+[U,D,V] = svd(A);
  
- w = V(:,end);
+w = V(:,end);
  
- w = [w(1) w(2) w(3);
-      w(2) w(4) w(5);
-      w(3) w(5) w(6)];
+w = [w(1) w(2) w(3);
+     w(2) w(4) w(5);
+     w(3) w(5) w(6)];
  
- P = Pproj(1:3, :)*inv(Hp);
- M = P(:,1:end-1);
+P = Pproj(1:3, :)*inv(Hp);
+M = P(:,3);
  
- A = chol(inv(M'*w*M));
+A = chol(inv(M'*w*M));
  
 Ha = eye(4,4);
 Ha(1:3,1:3) = inv(A);
