@@ -96,7 +96,7 @@ while(criteria > 0.1)
             lambda(i,:) = lambda(i,:) ./ normalize_row;
         end
         %5.3 If the entries changed significantly, repeat 1 and 2
-        d_lambda = norm(lambda_old - lambda)^2
+        d_lambda = norm(lambda_old - lambda)^2;
         change = abs(d_lambda - d_lambda_old)/d_lambda;
     end
 
@@ -138,11 +138,7 @@ while(criteria > 0.1)
     
     Pproj(1:3,:) = T1\Pproj(1:3,:); 
     Pproj(4:6,:) = T2\Pproj(4:6,:);
-    criteria = (abs(d - d_old)/d)
-    
+    criteria = (abs(d - d_old)/d);
 end
-
-
-    
 end
 

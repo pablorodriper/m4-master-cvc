@@ -409,11 +409,69 @@ I{2} = sum(Irgb{2}, 3) / 3;
 
 Ncam = length(I);
 
+% Compute keypoints and matches.
+points = cell(2,1);
+descr = cell(2,1);
+for i = 1:2
+    [points{i}, descr{i}] = sift(I{i}, 'Threshold', 0.01);
+    points{i} = points{i}(1:2,:);
+end
+
+matches = siftmatch(descr{1}, descr{2});
+
+% Plot matches.
+fig = figure();
+plotmatches(I{1}, I{2}, points{1}, points{2}, matches, 'Stacking', 'v');
+%saveas(fig,'results/1_facade_with_outliers', 'epsc');
+
+% Fit Fundamental matrix and remove outliers.
+x1 = points{1}(:, matches(1, :));
+x2 = points{2}(:, matches(2, :));
+[F, inliers] = ransac_fundamental_matrix(homog(x1), homog(x2), 2.0);
+
+% Plot inliers.
+inlier_matches = matches(:, inliers);
+fig = figure;
+plotmatches(I{1}, I{2}, points{1}, points{2}, inlier_matches, 'Stacking', 'v');
+%saveas(fig,'results/2_facade_without_outliers', 'epsc')
+
+x1 = points{1}(:, inlier_matches(1, :));
+x2 = points{2}(:, inlier_matches(2, :));
+
+x1 = homog(x1);
+x2 = homog(x2);
+
 % ToDo: compute a projective reconstruction using the factorization method
+
+[Pproj, Xproj] = factorization_method(0, x1, x2, flag);
 
 % ToDo: show the data points (image correspondences) and the projected
 % points (of the reconstructed 3D points) in images 1 and 2. Reuse the code
 % in section 'Check projected points' (synthetic experiment).
+
+P1 = Pproj(1:3,:);
+P2 = Pproj(4:6,:);
+
+for i=1:2
+    x_proj{i} = euclid(Pproj(3*i-2:3*i, :)*Xproj);
+end
+x_d{1} = euclid(x1);
+x_d{2} = euclid(x2);
+
+% image 1
+figure;
+hold on
+plot(x_d{1}(1,:),x_d{1}(2,:),'r*'); 
+plot(x_proj{1}(1,:),x_proj{1}(2,:),'bo');
+axis equal
+
+% image 2
+figure;
+hold on
+plot(x_d{2}(1,:),x_d{2}(2,:),'r*');
+plot(x_proj{2}(1,:),x_proj{2}(2,:),'bo');
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. Affine reconstruction (real data)
@@ -436,6 +494,7 @@ focal_ratio = 1;
 params.PRINT = 1;
 params.PLOT = 1;
 [horizon, VPs] = detect_vps(img_in, folder_out, manhattan, acceleration, focal_ratio, params);
+
 
 
 %% Visualize the result
