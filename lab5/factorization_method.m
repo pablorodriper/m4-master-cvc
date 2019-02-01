@@ -44,12 +44,12 @@ e21 = V(:,3) / V(3,3);
 
 Ncam=2;
 Npoints=length(x1);
-lambda= zeros(Ncam, Npoints);
+lambda = zeros(Ncam, Npoints);
 
 
 %Initialization 
 if isequal(flag,'ones')
-    lambda= ones(Ncam, Npoints);
+    lambda = ones(Ncam, Npoints);
 else
     lambda(1, :) = ones(1,Npoints);
     
@@ -59,20 +59,18 @@ else
         lambda(1,j) = num1/denom1;
     end
 
-
      for j = 1:Npoints
         num2 = (x1(:, j)'*F21*cross(e21, x2(:,j)))*lambda(1, j);
         denom2 = norm(cross(e21, x2(:,j))).^2;
         lambda(2,j) = num2/denom2;
      end
-     
 end
 criteria = 100000;
 d = 0;
 
 while(criteria > 0.1)
     
-% 5. Balance W by column-wise and “triplet-of-rows”-wise scalar 
+% 5. Balance W by column-wise and ?triplet-of-rows?-wise scalar 
     % mutliplication
     %Note that, since we work with normalized image coordinates q it 
     %would be sufficient to balance only the lambda	matrix instead of W
@@ -106,8 +104,6 @@ while(criteria > 0.1)
     A = lambda(1,:) .* norm_x1; 
     B= lambda(2,:) .* norm_x2;
     W = cat(1, A, B);
-
-    
 
     % 6. Compute the SVD of the balanced matrix W
     [U,D,V] = svd(W);

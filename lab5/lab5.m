@@ -90,14 +90,14 @@ w = 900;
 h = 600;
 
 % visualize as point cloud
-figure; hold on;
-plot_camera2(P1,w,h);
-plot_camera2(P2,w,h);
-for i = 1:length(X)
-    scatter3(X(1,i), X(2,i), X(3,i), 5^2, [0.5 0.5 0.5], 'filled');
-end
-axis equal;
-axis vis3d;
+%figure; hold on;
+%plot_camera2(P1,w,h);
+%plot_camera2(P2,w,h);
+%for i = 1:length(X)
+%    scatter3(X(1,i), X(2,i), X(3,i), 5^2, [0.5 0.5 0.5], 'filled');
+%end
+%axis equal;
+%axis vis3d;
 
 %% visualize as lines
 figure;
@@ -183,17 +183,19 @@ x_d{1} = euclid(P1*Xh);
 x_d{2} = euclid(P2*Xh);
 
 % image 1
-figure;
+fig = figure;
 hold on
 plot(x_d{1}(1,:),x_d{1}(2,:),'r*'); 
 plot(x_proj{1}(1,:),x_proj{1}(2,:),'bo');
 axis equal
+saveas(fig,'results/projected_points_1', 'epsc')
 
 % image 2
-figure;
+fig = figure;
 hold on
 plot(x_d{2}(1,:),x_d{2}(2,:),'r*');
 plot(x_proj{2}(1,:),x_proj{2}(2,:),'bo');
+saveas(fig,'results/projected_points_2', 'epsc')
 
 
 %% Visualize projective reconstruction
@@ -279,7 +281,6 @@ p = p/p(end);
 
 Hp = [1 0 0 0; 0 1 0 0; 0 0 1 0; p(1) p(2) p(3) p(4)];
 
-
 %% check results
 
 Xa = euclid(Hp*Xproj);
@@ -340,9 +341,13 @@ A = [u(1)*v(1) u(1)*v(2)+u(2)*v(1) u(1)*v(3)+u(3)*v(1) u(2)*v(2) u(2)*v(3)+u(3)*
          1              0                   0              -1             0              0];
 
 [U,D,V] = svd(A);
- 
 w = V(:,end);
- 
+
+%
+%A_w_null = null(A)
+%w = A_w_null(:,1)
+%
+
 w = [w(1) w(2) w(3);
      w(2) w(4) w(5);
      w(3) w(5) w(6)];
@@ -351,6 +356,7 @@ P = Pproj(1:3,:)*inv(Hp);
 M = P(:,1:3);
  
 A = chol(inv(M'*w*M));
+%A = chol(abs(inv(M'*w*M)));
 
 Ha = eye(4,4);
 Ha(1:3,1:3) = inv(A);
@@ -460,6 +466,7 @@ x_d{2} = euclid(x2);
 
 % image 1
 figure;
+imshow(I{1});
 hold on
 plot(x_d{1}(1,:),x_d{1}(2,:),'r*'); 
 plot(x_proj{1}(1,:),x_proj{1}(2,:),'bo');
@@ -467,6 +474,7 @@ axis equal
 
 % image 2
 figure;
+imshow(I{2});
 hold on
 plot(x_d{2}(1,:),x_d{2}(2,:),'r*');
 plot(x_proj{2}(1,:),x_proj{2}(2,:),'bo');
@@ -501,21 +509,21 @@ img_in =  'Data/0000_s.png'; % input image
 params = load('VPs.mat');
 
 % Compute the vanishing points in each image
-v1 = params.VPs_0(:,1);
-v2 = params.VPs_0(:,2);
-v3 = params.VPs_0(:,3);
+v1 = [params.VPs_0(:,1); 1];
+v2 = [params.VPs_0(:,2); 1];
+v3 = [params.VPs_0(:,3); 1];
 
-v1p = params.VPs_1(:,1);
-v2p = params.VPs_1(:,2);
-v3p = params.VPs_1(:,3);
+v1p = [params.VPs_1(:,1); 1];
+v2p = [params.VPs_1(:,2); 1];
+v3p = [params.VPs_1(:,3); 1];
 
 Pproj1 = Pproj(1:3, :);
 Pproj2 = Pproj(4:6, :);
 
 %Corresponding 3D points by triangulation
-point_1 = triangulate(v1, v1p, Pproj1, Pproj2, [w, h]);
-point_2 = triangulate(v2, v2p, Pproj1, Pproj2, [w, h]);
-point_3 = triangulate(v3, v3p, Pproj1, Pproj2, [w, h]);
+point_1 = triangulate(euclid(v1), euclid(v1p), Pproj1, Pproj2, [w, h]);
+point_2 = triangulate(euclid(v2), euclid(v2p), Pproj1, Pproj2, [w, h]);
+point_3 = triangulate(euclid(v3), euclid(v3p), Pproj1, Pproj2, [w, h]);
 
 X = [point_1'; point_2'; point_3'];
 
@@ -540,7 +548,7 @@ Xe = euclid(Hp*Xm);
 figure; hold on;
 [w,h] = size(I{1});
 for i = 1:length(Xe)
-    scatter3(Xe(1,i), Xe(2,i), Xe(3,i), 2^2, [r(i) g(i) b(i)], 'filled');
+    scatter3(Xe(1,i), -Xe(2,i), -Xe(3,i), 80, [r(i) g(i) b(i)], 'filled');
 end
 axis equal;
 
@@ -554,11 +562,6 @@ u = homog(params.VPs_0(:,1));
 v = homog(params.VPs_0(:,2));
 z = homog(params.VPs_0(:,3));
 
-% u = [params.VPs_0(:,1);0.0001];
-% v = [params.VPs_0(:,2);0.0001];
-% z = [params.VPs_0(:,3);0.0001];
-
-
 A = [u(1)*v(1) u(1)*v(2)+u(2)*v(1) u(1)*v(3)+u(3)*v(1) u(2)*v(2) u(2)*v(3)+u(3)*v(2) u(3)*v(3);
      u(1)*z(1) u(1)*z(2)+u(2)*z(1) u(1)*z(3)+u(3)*z(1) u(2)*z(2) u(2)*z(3)+u(3)*z(2) u(3)*z(3);
      v(1)*z(1) v(1)*z(2)+v(2)*z(1) v(1)*z(3)+v(3)*z(1) v(2)*z(2) v(2)*z(3)+v(3)*z(2) v(3)*z(3);
@@ -566,9 +569,8 @@ A = [u(1)*v(1) u(1)*v(2)+u(2)*v(1) u(1)*v(3)+u(3)*v(1) u(2)*v(2) u(2)*v(3)+u(3)*
          1              0                   0              -1             0              0];
 
 [U,D,V] = svd(A);
- 
 w = V(:,end);
- 
+
 w = [w(1) w(2) w(3);
      w(2) w(4) w(5);
      w(3) w(5) w(6)];
@@ -584,43 +586,12 @@ Ha(1:3,1:3) = inv(A);
 %% check results
 
 Xa = euclid(Ha*Hp*Xproj);
-figure;
-hold on;
-X1 = Xa(:,1); X2 = Xa(:,2); X3 = Xa(:,3); X4 = Xa(:,4);
-plot3([X1(1) X2(1)], [X1(2) X2(2)], [X1(3) X2(3)]);
-plot3([X3(1) X4(1)], [X3(2) X4(2)], [X3(3) X4(3)]);
-X5 = Xa(:,5); X6 = Xa(:,6); X7 = X2; X8 = X3;
-plot3([X5(1) X6(1)], [X5(2) X6(2)], [X5(3) X6(3)]);
-plot3([X7(1) X8(1)], [X7(2) X8(2)], [X7(3) X8(3)]);
-plot3([X5(1) X7(1)], [X5(2) X7(2)], [X5(3) X7(3)]);
-plot3([X6(1) X8(1)], [X6(2) X8(2)], [X6(3) X8(3)]);
-X5 = Xa(:,7); X6 = Xa(:,8); X7 = X1; X8 = X4;
-plot3([X5(1) X6(1)], [X5(2) X6(2)], [X5(3) X6(3)]);
-plot3([X7(1) X8(1)], [X7(2) X8(2)], [X7(3) X8(3)]);
-plot3([X5(1) X7(1)], [X5(2) X7(2)], [X5(3) X7(3)]);
-plot3([X6(1) X8(1)], [X6(2) X8(2)], [X6(3) X8(3)]);
-X5 = Xa(:,9); X6 = Xa(:,10); X7 = Xa(:,11); X8 = Xa(:,12);
-plot3([X5(1) X6(1)], [X5(2) X6(2)], [X5(3) X6(3)]);
-plot3([X7(1) X8(1)], [X7(2) X8(2)], [X7(3) X8(3)]);
-plot3([X5(1) X7(1)], [X5(2) X7(2)], [X5(3) X7(3)]);
-plot3([X6(1) X8(1)], [X6(2) X8(2)], [X6(3) X8(3)]);
-X5 = Xa(:,13); X6 = Xa(:,14); X7 = Xa(:,15); X8 = Xa(:,16);
-plot3([X5(1) X6(1)], [X5(2) X6(2)], [X5(3) X6(3)]);
-plot3([X7(1) X8(1)], [X7(2) X8(2)], [X7(3) X8(3)]);
-plot3([X5(1) X7(1)], [X5(2) X7(2)], [X5(3) X7(3)]);
-plot3([X6(1) X8(1)], [X6(2) X8(2)], [X6(3) X8(3)]);
-X5 = Xa(:,17); X6 = Xa(:,18); X7 = Xa(:,19); X8 = Xa(:,20);
-plot3([X5(1) X6(1)], [X5(2) X6(2)], [X5(3) X6(3)]);
-plot3([X7(1) X8(1)], [X7(2) X8(2)], [X7(3) X8(3)]);
-plot3([X5(1) X7(1)], [X5(2) X7(2)], [X5(3) X7(3)]);
-plot3([X6(1) X8(1)], [X6(2) X8(2)], [X6(3) X8(3)]);
-X5 = Xa(:,21); X6 = Xa(:,22); X7 = Xa(:,23); X8 = Xa(:,24);
-plot3([X5(1) X6(1)], [X5(2) X6(2)], [X5(3) X6(3)]);
-plot3([X7(1) X8(1)], [X7(2) X8(2)], [X7(3) X8(3)]);
-plot3([X5(1) X7(1)], [X5(2) X7(2)], [X5(3) X7(3)]);
-plot3([X6(1) X8(1)], [X6(2) X8(2)], [X6(3) X8(3)]);
-axis vis3d
-axis equal
+%Xa = euclid(Ha*Hp*Xm);
+figure; hold on;
+for i = 1:length(Xe)
+    scatter3(Xa(1,i), -Xa(2,i), -Xa(3,i), 70, [r(i) g(i) b(i)], 'filled');
+end
+axis equal;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 7. OPTIONAL: Projective reconstruction from two views
