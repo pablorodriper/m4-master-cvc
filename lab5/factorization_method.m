@@ -1,7 +1,7 @@
-function [Pproj, Xproj] = factorization_method(Xh, x1, x2, flag)
+function [Pproj, Xproj] = factorization_method(x1, x2, flag)
 %
-% Q(p) :unknown homogeneus coordinate vectors of the 3D points
-% P(i) unknown 3x4 image projection matrices
+% Q(p): unknown homogeneus coordinate vectors of the 3D points
+% P(i): unknown 3x4 image projection matrices
 % q(i,p): measured homogeneus coordinate vectors of the image points.
 %       -Projections of Q_p
 % p = 1,...,n labels points n=Npoints
