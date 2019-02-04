@@ -190,6 +190,7 @@ plotmatches(I{1}, I{2}, points{1}, points{2}, matches, 'Stacking', 'v');
 % Fit Fundamental matrix and remove outliers.
 x1 = points{1}(:, matches(1, :));
 x2 = points{2}(:, matches(2, :));
+
 [F, inliers] = ransac_fundamental_matrix(homog(x1), homog(x2), 2.0);
 
 % Plot inliers.
@@ -216,6 +217,20 @@ for i=1:2
 end
 x_d{1} = euclid(x1);
 x_d{2} = euclid(x2);
+
+err_cam1 = sqrt(sum( x_proj{1}-x_d{1}).^2);
+err_cam2 = sqrt(sum(  x_proj{2}-x_d{2}).^2);
+
+figure;
+h1 = histogram(err_cam1);
+hold on
+h2 = histogram(err_cam2);
+mean_err1 = mean(err_cam1);
+mean_err2 = mean(err_cam2);
+total_mean = (mean_err1+mean_err2)/2
+line([total_mean total_mean], ylim, 'Color','g');
+legend('hist error camera 1', 'hist error camera 2', 'mean error value');
+hold off
 
 % image 1
 figure;subplot(1,2,2);
@@ -326,22 +341,72 @@ axis equal;title('Metric reconstruction')
 % The first projection matrix is always 
 P1 = [eye(3,3) zeros(3,1)];
 
-% Given the fundamental matrix
-F = fundamental_matrix(x1, x2);
-
 % Calculate e' from e'^T*F = 0
-[U, D, V] = svd(F);
+[U, D, V] = svd(F); % The fundamental matrix is previously calculated
 e = V(:,3) / V(3,3);
 skew_e =[0 -e(3) e(2) ; e(3) 0 -e(1) ; -e(2) e(1) 0 ];
 
 P2 = [skew_e*F e];
 
 if (rank(P2) == 3)
-    'rank of P2 = 3';
+    fprintf('OK: rank of P2 = 3\n');
 end
 
-% toDo: update the reconstruction to affine and metric as before (reuse the code).
+%% (reuse the code)
+% toDo: update the reconstruction to affine and metric as before
+params = load('VPs.mat');
 
+% Compute the vanishing points in each image
+v1 = [params.VPs_0(:,1); 1];
+v2 = [params.VPs_0(:,2); 1];
+v3 = [params.VPs_0(:,3); 1];
+
+v1p = [params.VPs_1(:,1); 1];
+v2p = [params.VPs_1(:,2); 1];
+v3p = [params.VPs_1(:,3); 1];
+
+Hp = affine_reconstruction(v1,v2,v3,v1p,v2p,v3p,P1,P2,w,h);
+
+% x1m are the data points in image 1
+x1m = x_d{1};
+% Xm are the reconstructed 3D points (projective reconstruction)
+
+%%%%%%% Probably the error is in this line, but we are not sure on 
+%%%%%%% what Xproj use.
+Xm = (x2'*P2)';
+%%%%%%%%
+%%%%%%%%
+
+r = interp2(double(Irgb{1}(:,:,1)), x1m(1,:), x1m(2,:));
+g = interp2(double(Irgb{1}(:,:,2)), x1m(1,:), x1m(2,:));
+b = interp2(double(Irgb{1}(:,:,3)), x1m(1,:), x1m(2,:));
+Xe = euclid(Hp*Xm);
+figure; hold on;
+[w,h] = size(I{1});
+for i = 1:length(Xe)
+    scatter3(Xe(1,i), Xe(2,i), Xe(3,i), 80, [r(i) g(i) b(i)], 'filled');
+end
+axis equal;title('Affine reconstruction')
+
+% 6. Metric reconstruction (real data)
+
+% ToDo: compute the matrix Ha that updates the affine reconstruction
+% to a metric one and visualize the result in 3D as in the previous section
+
+u = homog(params.VPs_0(:,1));
+v = homog(params.VPs_0(:,2));
+z = homog(params.VPs_0(:,3));
+
+Ha = metric_reconstruction(u,v,z,P1,Hp);
+
+% check results
+Xa = euclid(Ha*Hp*Xproj);
+
+figure; hold on;
+for i = 1:length(Xa)
+    scatter3(Xa(1,i), -Xa(2,i), Xa(3,i), 70, [r(i) g(i) b(i)], 'filled');
+end
+axis equal;title('Metric reconstruction')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 8. OPTIONAL: Projective reconstruction from more than two views
 
